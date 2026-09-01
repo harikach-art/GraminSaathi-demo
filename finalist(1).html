@@ -1,0 +1,2021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>GraminSaathi — AI Business Advisor & Digital Memory</title>
+<style>
+  :root{
+    --green:#1b7a3d; --green-d:#125c2c; --orange:#e8721c; --bg:#f6f8f5;
+    --card:#ffffff; --text:#1f2a24; --muted:#5c6b62; --danger:#c0392b; --border:#dfe6e0;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);}
+  header{background:var(--green);color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50;}
+  header .brand{font-size:1.3rem;font-weight:700;display:flex;gap:8px;align-items:center;}
+  
+  /* Top-Right Header Actions & Official Profile Control */
+  .header-actions{display:flex;align-items:center;gap:10px;}
+  .profile-header-btn{background:rgba(255,255,255,.15);border:none;color:#fff;font-size:.95rem;font-weight:600;padding:6px 12px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s;}
+  .profile-header-btn:hover{background:rgba(255,255,255,.25);}
+  .profile-header-btn .avatar-icon{width:26px;height:26px;border-radius:50%;background:#fff;color:var(--green-d);display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:700;}
+  @media(max-width:560px){.profile-header-btn .profile-label{display:none;}}
+
+  /* Profile Quick Popover Dropdown */
+  #profileDropdown{position:absolute;right:54px;top:56px;background:#fff;color:var(--text);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:14px;display:none;z-index:60;min-width:240px;border:1px solid var(--border);}
+  #profileDropdown.open{display:block;}
+  #profileDropdown h4{margin:0 0 6px;color:var(--green-d);font-size:1.05rem;}
+  #profileDropdown p{margin:3px 0;font-size:.85rem;color:var(--muted);}
+  #profileDropdown .edit-profile-btn{width:100%;margin-top:10px;background:var(--orange);color:#fff;border:none;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer;font-size:.88rem;}
+
+  header button.settings-icon-btn{background:rgba(255,255,255,.15);border:none;color:#fff;font-size:1.3rem;padding:8px 10px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  #settingsMenu{position:absolute;right:14px;top:56px;background:#fff;color:var(--text);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px;display:none;z-index:60;min-width:220px;}
+  #settingsMenu.open{display:block;}
+  #settingsMenu button{width:100%;text-align:left;background:none;color:var(--text);border:none;padding:10px 8px;border-radius:8px;font-size:1rem;cursor:pointer;}
+  #settingsMenu button:hover{background:var(--bg);}
+  .tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:58px;z-index:40;}
+  .tab-btn{flex:1 0 auto;padding:12px 14px;border:none;background:none;font-size:.95rem;cursor:pointer;color:var(--muted);white-space:nowrap;border-bottom:3px solid transparent;}
+  .tab-btn.active{color:var(--green-d);border-bottom-color:var(--orange);font-weight:700;}
+  main{padding:16px;max-width:900px;margin:0 auto;padding-bottom:110px;}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;}
+  .card h2{margin-top:0;font-size:1.15rem;color:var(--green-d);}
+  .hint{color:var(--muted);font-size:.85rem;margin-top:-6px;margin-bottom:10px;}
+  label{display:block;font-weight:600;margin:10px 0 4px;font-size:.92rem;}
+  input,select,textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:1rem;background:#fff;color:var(--text);}
+  .btn{background:var(--green);color:#fff;border:none;padding:12px 18px;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;margin-top:12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;}
+  .btn.secondary{background:var(--orange);}
+  .btn.ghost{background:none;border:1px solid var(--green);color:var(--green-d);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  @media(max-width:560px){.grid2,.grid3{grid-template-columns:1fr;}}
+  .stat{background:#eef6ee;border-radius:10px;padding:12px;text-align:center;}
+  .stat .val{font-size:1.4rem;font-weight:700;color:var(--green-d);}
+  .stat .lbl{font-size:.8rem;color:var(--muted);}
+  .badge{display:inline-block;background:#fff0e2;color:var(--orange);border-radius:20px;padding:3px 10px;font-size:.75rem;font-weight:700;margin-left:6px;}
+  .disclaimer{background:#fff8e6;border:1px solid #f1d98a;color:#7a5c00;border-radius:10px;padding:10px 12px;font-size:.85rem;margin-bottom:12px;}
+
+  /* Collapsible / Expandable UI for Financial Section */
+  details.be-group{border:1px solid var(--border);border-radius:10px;padding:8px 12px;margin-bottom:12px;background:#fff;}
+  details.be-group summary{font-weight:700;color:var(--green-d);cursor:pointer;outline:none;padding:6px 0;font-size:1rem;}
+  details.be-group[open]{background:#fafdfa;}
+
+  /* Business Health Badge */
+  .health-badge{display:inline-block;padding:8px 14px;border-radius:20px;font-weight:700;font-size:1rem;margin-bottom:8px;}
+  .health-badge.profitable{background:#e6f4ea;color:#137333;}
+  .health-badge.near{background:#fef7e0;color:#b06000;}
+  .health-badge.loss{background:#fce8e6;color:#c5221f;}
+
+  /* Visual Break-Even Chart */
+  .be-chart-container{width:100%;max-width:500px;margin:16px auto;position:relative;}
+  .be-chart-svg{width:100%;height:auto;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:visible;}
+
+  /* Language overlay */
+  #langOverlay{position:fixed;inset:0;background:linear-gradient(160deg,#1b7a3d,#0e3f20);color:#fff;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
+  #langOverlay h1{font-size:1.6rem;margin-bottom:6px;}
+  #langOverlay .sub{opacity:.9;margin-bottom:30px;font-size:1rem;}
+  #langOverlay{overflow-y:auto;}
+  #langSearchInput{width:100%;max-width:380px;padding:14px 16px;border-radius:14px;border:none;font-size:1.05rem;margin-bottom:22px;}
+  .lang-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:420px;}
+  .lang-buttons.hidden{display:none;}
+  .lang-buttons button{font-size:1.05rem;padding:18px 10px;border-radius:16px;border:none;background:#fff;color:var(--green-d);font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.25);line-height:1.3;}
+  .lang-buttons button .native{display:block;font-size:1.25rem;}
+  .lang-buttons button .eng{display:block;font-size:.72rem;font-weight:500;color:var(--muted);margin-top:2px;}
+  .lang-buttons button:active{transform:scale(.97);}
+  .lang-buttons button.hide{display:none;}
+  .lang-more-toggle{color:#fff;text-decoration:underline;cursor:pointer;margin:18px 0;font-size:.95rem;opacity:.9;}
+  @media(max-width:420px){.lang-buttons{grid-template-columns:1fr;max-width:300px;}}
+
+  /* Mic FAB */
+  .mic-fab{position:fixed;bottom:22px;right:20px;width:64px;height:64px;border-radius:50%;background:var(--orange);color:#fff;font-size:1.8rem;border:none;box-shadow:0 8px 20px rgba(0,0,0,.3);cursor:pointer;z-index:70;}
+  .mic-fab.listening{animation:pulse 1.1s infinite;background:var(--danger);}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(192,57,43,.6);}70%{box-shadow:0 0 0 18px rgba(192,57,43,0);}100%{box-shadow:0 0 0 0 rgba(192,57,43,0);}}
+
+  /* Voice panel */
+  .voice-panel{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top-left-radius:20px;border-top-right-radius:20px;box-shadow:0 -8px 30px rgba(0,0,0,.25);padding:18px;z-index:80;max-height:70vh;overflow-y:auto;}
+  .voice-panel.hidden{display:none;}
+  .voice-state{font-size:1.1rem;font-weight:700;color:var(--green-d);margin-bottom:8px;}
+  .voice-transcript{background:#f2f2f2;border-radius:10px;padding:10px;margin-bottom:8px;font-style:italic;min-height:20px;}
+  .voice-response{background:#eef6ee;border-radius:10px;padding:12px;margin-bottom:10px;font-size:1.02rem;min-height:24px;white-space:pre-line;}
+  .voice-actions{display:flex;flex-wrap:wrap;gap:8px;}
+  .voice-actions button{flex:1 1 auto;padding:10px 8px;border-radius:10px;border:none;background:var(--green);color:#fff;font-weight:600;cursor:pointer;font-size:.85rem;}
+  .voice-actions button.close{background:#999;}
+
+  /* Easy voice wizard */
+  .wizard{position:fixed;inset:0;background:#fff;z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
+  .wizard.hidden{display:none;}
+  .wizard .q{font-size:1.3rem;font-weight:700;color:var(--green-d);margin-bottom:14px;}
+  .wizard .answer{background:#f2f2f2;border-radius:12px;padding:14px;font-size:1.1rem;min-height:24px;margin-bottom:16px;width:100%;max-width:420px;}
+  .wizard .bigmic{width:90px;height:90px;border-radius:50%;background:var(--orange);color:#fff;font-size:2.2rem;border:none;box-shadow:0 8px 20px rgba(0,0,0,.25);margin-bottom:16px;}
+  .wizard .row{display:flex;gap:12px;}
+  .wizard .row button{padding:14px 22px;font-size:1.05rem;border-radius:12px;border:none;font-weight:700;cursor:pointer;}
+  .wizard .yes{background:var(--green);color:#fff;}
+  .wizard .change{background:#eee;color:var(--text);}
+  .wizard .exit{position:absolute;top:18px;right:18px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--muted);}
+
+  /* Chat (advisor) */
+  #chatLog{max-height:340px;overflow-y:auto;margin-bottom:10px;}
+  .msg{padding:10px 12px;border-radius:12px;margin-bottom:8px;max-width:85%;}
+  .msg.user{background:var(--green);color:#fff;margin-left:auto;}
+  .msg.bot{background:#eef6ee;color:var(--text);}
+  .chat-input{display:flex;gap:8px;}
+  .chat-input input{flex:1;}
+
+  /* Business Comparison feature */
+  .compare-card{background:#fbfdfb;border:1px solid var(--border);border-radius:12px;padding:12px;position:relative;}
+  .compare-card h3{margin:0 0 8px;color:var(--green-d);font-size:1rem;display:flex;align-items:center;gap:6px;justify-content:space-between;}
+  .compare-card .kindTag{font-size:.7rem;padding:2px 8px;border-radius:20px;background:#eef6ee;color:var(--green-d);font-weight:700;}
+  .compare-card.kind-current .kindTag, .compare-card.kind-proposed .kindTag{background:#fff0e2;color:var(--orange);}
+  .removeBizBtn{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--danger);font-size:1.1rem;cursor:pointer;}
+  .flow-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;margin:6px 0 16px;}
+  .flow-box{width:100%;max-width:420px;border-radius:12px;padding:14px;text-align:center;}
+  .flow-box.prev{background:#f2f2f2;}
+  .flow-box.curr{background:#eef6ee;border:2px solid var(--green);}
+  .flow-box .flabel{font-size:.85rem;color:var(--muted);font-weight:600;}
+  .flow-box .fval{font-size:1.6rem;font-weight:800;color:var(--green-d);margin-top:2px;}
+  .flow-arrow{font-size:1.6rem;color:var(--orange);}
+  .improve-badge{display:inline-block;margin-top:8px;background:#eef6ee;color:var(--green-d);border-radius:20px;padding:6px 14px;font-weight:700;font-size:.95rem;}
+  .improve-badge.negative{background:#fdecea;color:var(--danger);}
+  table.cmp-table{width:100%;border-collapse:collapse;font-size:.88rem;}
+  table.cmp-table th, table.cmp-table td{border:1px solid var(--border);padding:8px;text-align:center;}
+  table.cmp-table th{background:#eef6ee;color:var(--green-d);}
+  .change-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border);font-size:.92rem;}
+  .change-row:last-child{border-bottom:none;}
+  .change-row .up{color:var(--green-d);font-weight:700;}
+  .change-row .down{color:var(--danger);font-weight:700;}
+
+  /* --- DIGITAL NOTES FEATURE STYLES --- */
+  .notes-flow{display:flex;align-items:center;justify-content:space-around;background:#eef6ee;border-radius:12px;padding:12px;margin:12px 0 18px;text-align:center;}
+  .notes-flow-step{display:flex;flex-direction:column;align-items:center;gap:4px;font-weight:700;font-size:.85rem;color:var(--green-d);}
+  .notes-flow-step span{font-size:1.5rem;}
+  .notes-flow-arrow{font-size:1.2rem;color:var(--orange);font-weight:700;}
+
+  .forget-box{background:#fff8ee;border:1px dashed var(--orange);border-radius:12px;padding:14px;margin-bottom:16px;}
+  .forget-box h3{margin:0 0 8px;font-size:.98rem;color:var(--orange);display:flex;align-items:center;gap:6px;}
+  .forget-box ul{margin:0;padding-left:18px;font-size:.88rem;color:var(--muted);}
+  .forget-box li{margin-bottom:4px;}
+
+  .notes-controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+  .notes-controls input{flex:1;min-width:180px;}
+  .notes-controls select{width:auto;min-width:140px;}
+
+  .note-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;position:relative;transition:box-shadow .2s;}
+  .note-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.05);}
+  .note-card.pinned{border-left:5px solid var(--orange);background:#fffdf9;}
+  .note-card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;}
+  .note-card-title{font-size:1.05rem;font-weight:700;color:var(--green-d);margin:0;display:flex;align-items:center;gap:6px;}
+  .note-cat-badge{font-size:.72rem;background:#eef6ee;color:var(--green-d);padding:2px 8px;border-radius:12px;font-weight:600;}
+  .note-card-date{font-size:.75rem;color:var(--muted);margin-bottom:8px;}
+  .note-card-preview{font-size:.92rem;color:var(--text);white-space:pre-wrap;word-break:break-word;margin-bottom:12px;}
+  .note-card-actions{display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #f0f0f0;padding-top:8px;}
+  .note-card-actions button{background:none;border:none;font-size:.85rem;cursor:pointer;padding:4px 8px;border-radius:6px;color:var(--muted);display:flex;align-items:center;gap:4px;}
+  .note-card-actions button:hover{background:var(--bg);color:var(--text);}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:120;display:flex;align-items:center;justify-content:center;padding:16px;}
+  .modal-overlay.hidden{display:none;}
+  .modal-card{background:#fff;border-radius:16px;width:100%;max-width:500px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto;}
+
+  .empty-notes{text-align:center;padding:32px 16px;background:#fff;border:1px dashed var(--border);border-radius:14px;}
+  .empty-notes .icon{font-size:2.8rem;margin-bottom:8px;}
+  .empty-notes h3{margin:0 0 6px;color:var(--green-d);}
+  .empty-notes p{color:var(--muted);font-size:.9rem;margin-bottom:16px;}
+
+  /* Home Section Cards */
+  .home-hero{background:linear-gradient(135deg, var(--green-d), var(--green));color:#fff;border-radius:16px;padding:20px;margin-bottom:16px;}
+  .home-hero h1{margin:0 0 8px;font-size:1.4rem;}
+  .home-hero p{margin:0 0 14px;opacity:.9;font-size:.95rem;}
+  .feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:560px){.feature-grid{grid-template-columns:1fr;}}
+  .feature-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;}
+  .feature-card h3{margin:0 0 6px;font-size:1.05rem;color:var(--green-d);display:flex;align-items:center;gap:6px;}
+  .feature-card p{font-size:.88rem;color:var(--muted);margin:0 0 12px;}
+</style>
+</head>
+<body>
+
+<!-- LANGUAGE SELECTION OVERLAY -->
+<div id="langOverlay">
+  <h1 id="langTitle">🌐 Select Your Preferred Language</h1>
+  <div class="sub">మీకు సౌకర్యమైన భాషను ఎంచుకోండి · अपनी सुविधा की भाषा चुनें</div>
+  <div class="sub" style="font-size:.85rem;margin-top:-18px;margin-bottom:26px;opacity:.85;">🌐 Any language · 🎙️ Just speak · 🤖 AI business guidance</div>
+  <input id="langSearchInput" type="text" placeholder="🔍 Search language / भाषा खोजें / భాష వెతకండి" />
+  <div class="lang-buttons" id="langButtonsPriority"></div>
+  <div class="lang-more-toggle" id="langMoreToggle">▾ More languages</div>
+  <div class="lang-buttons lang-buttons-more hidden" id="langButtonsMore"></div>
+</div>
+
+<header>
+  <div class="brand">🌾 GraminSaathi</div>
+  <div class="header-actions">
+    <!-- Official Profile Button in Header -->
+    <button class="profile-header-btn" id="headerProfileBtn" title="Profile Control">
+      <div class="avatar-icon">👤</div>
+      <span class="profile-label" data-i18n="tabProfile">Profile</span>
+    </button>
+    <button id="settingsBtn" class="settings-icon-btn">⚙️</button>
+  </div>
+
+  <!-- Profile Quick Dropdown Popover -->
+  <div id="profileDropdown">
+    <h4 id="dp_owner">Guest User</h4>
+    <p><strong>Business:</strong> <span id="dp_btype">Not Set</span></p>
+    <p><strong>Location:</strong> <span id="dp_location">Not Set</span></p>
+    <button class="edit-profile-btn" id="dp_editBtn" data-i18n="editProfileBtn">Edit Profile</button>
+  </div>
+
+  <div id="settingsMenu">
+    <button id="changeLangBtn">🌐 <span data-i18n="changeLanguage"></span></button>
+    <button id="easyVoiceToggleBtn">👩‍🌾 <span data-i18n="toggleEasyVoice"></span> (<span id="easyVoiceState">Off</span>)</button>
+  </div>
+</header>
+
+<nav class="tabs" id="tabNav">
+  <button class="tab-btn active" data-tab="home">🏠 <span data-i18n="tabHome"></span></button>
+  <button class="tab-btn" data-tab="notes">📝 <span data-i18n="tabNotes"></span></button>
+  <button class="tab-btn" data-tab="advisor">🤖 <span data-i18n="tabAdvisor"></span></button>
+  <button class="tab-btn" data-tab="financial">💰 <span data-i18n="tabFinancial"></span></button>
+  <button class="tab-btn" data-tab="schemes">🏛️ <span data-i18n="tabSchemes"></span></button>
+  <button class="tab-btn" data-tab="compare">📊 <span data-i18n="tabCompare"></span></button>
+  <button class="tab-btn" data-tab="dashboard">📊 <span data-i18n="tabDashboard"></span></button>
+</nav>
+
+<main>
+
+  <!-- HOME / LANDING TAB -->
+  <section class="tab-panel active" id="tab-home">
+    <div class="home-hero">
+      <h1 data-i18n="homeTitle"></h1>
+      <p data-i18n="homeSubtitle"></p>
+      <button class="btn secondary" id="homeVoiceStartBtn">🎙️ <span data-i18n="speakToSaathi"></span></button>
+    </div>
+
+    <div class="feature-grid">
+      <!-- Digital Memory Card -->
+      <div class="feature-card">
+        <div>
+          <h3>📝 <span data-i18n="digitalMemoryTitle"></span></h3>
+          <p data-i18n="digitalMemoryDesc"></p>
+        </div>
+        <button class="btn ghost" id="openNotesFromHomeBtn" data-i18n="openMyNotes"></button>
+      </div>
+
+      <!-- Business Advisor Card -->
+      <div class="feature-card">
+        <div>
+          <h3>🤖 <span data-i18n="aiAdvisorTitle"></span></h3>
+          <p data-i18n="aiAdvisorDesc"></p>
+        </div>
+        <button class="btn ghost" onclick="switchTab('advisor')" data-i18n="askAdvisor"></button>
+      </div>
+
+      <!-- Financial Calculators Card -->
+      <div class="feature-card">
+        <div>
+          <h3>💰 <span data-i18n="financialCalculatorsTitle"></span></h3>
+          <p data-i18n="financialCalculatorsDesc"></p>
+        </div>
+        <button class="btn ghost" onclick="switchTab('financial')" data-i18n="calcEmiProfit"></button>
+      </div>
+
+      <!-- Government Schemes Card -->
+      <div class="feature-card">
+        <div>
+          <h3>🏛️ <span data-i18n="schemesTitle"></span></h3>
+          <p data-i18n="schemesDesc"></p>
+        </div>
+        <button class="btn ghost" onclick="switchTab('schemes')" data-i18n="findSchemes"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MY DIGITAL NOTES TAB -->
+  <section class="tab-panel" id="tab-notes">
+    <div class="card">
+      <h2>📝 <span data-i18n="tabNotes"></span></h2>
+      <div class="hint" data-i18n="notesSubtitle"></div>
+
+      <!-- Digital Memory Positioning Flow -->
+      <div class="notes-flow">
+        <div class="notes-flow-step"><span>🎙️</span><span data-i18n="flowSpeak"></span></div>
+        <div class="notes-flow-arrow">↓</div>
+        <div class="notes-flow-step"><span>📝</span><span data-i18n="flowSave"></span></div>
+        <div class="notes-flow-arrow">↓</div>
+        <div class="notes-flow-step"><span>📌</span><span data-i18n="flowRemember"></span></div>
+        <div class="notes-flow-arrow">↓</div>
+        <div class="notes-flow-step"><span>✅</span><span data-i18n="flowAct"></span></div>
+      </div>
+
+      <!-- Things You Don't Want to Forget Section -->
+      <div class="forget-box">
+        <h3>💡 <span data-i18n="forgetTitle"></span></h3>
+        <ul>
+          <li data-i18n="forgetEx1"></li>
+          <li data-i18n="forgetEx2"></li>
+          <li data-i18n="forgetEx3"></li>
+          <li data-i18n="forgetEx4"></li>
+          <li data-i18n="forgetEx5"></li>
+        </ul>
+      </div>
+
+      <!-- Action & Controls Bar -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+        <button class="btn" id="addNewNoteBtn">➕ <span data-i18n="addNoteBtn"></span></button>
+        <button class="btn secondary" id="speakNoteBtn">🎙️ <span data-i18n="speakNoteBtn"></span></button>
+      </div>
+
+      <div class="notes-controls">
+        <input id="noteSearchInput" type="text" data-i18n-ph="searchNotesPh" />
+        <select id="noteCatFilter">
+          <option value="ALL" data-i18n="catAll">All Categories</option>
+          <option value="Business Idea" data-i18n="catIdea">Business Idea</option>
+          <option value="Important Instruction" data-i18n="catInstruction">Important Instruction</option>
+          <option value="Finance" data-i18n="catFinance">Finance</option>
+          <option value="Loan" data-i18n="catLoan">Loan</option>
+          <option value="Scheme" data-i18n="catScheme">Scheme</option>
+          <option value="Task" data-i18n="catTask">Task</option>
+          <option value="General" data-i18n="catGeneral">General</option>
+        </select>
+      </div>
+
+      <!-- Notes List Output -->
+      <div id="notesContainer"></div>
+    </div>
+  </section>
+
+  <!-- PROFILE TAB -->
+  <section class="tab-panel" id="tab-profile">
+    <div class="card">
+      <h2 data-i18n="profileHeading"></h2>
+      <div class="hint" data-i18n="profileHint"></div>
+      <button class="btn secondary" id="startEasyVoiceProfile">🎙️ <span data-i18n="fillByVoice"></span></button>
+
+      <label data-i18n="ownerName"></label>
+      <input id="p_owner" type="text" />
+
+      <label data-i18n="businessType"></label>
+      <select id="p_btype">
+        <option value="kirana">Kirana / General Store</option>
+        <option value="tailoring">Tailoring / Garments</option>
+        <option value="dairy">Dairy / Poultry</option>
+        <option value="handicrafts">Handicrafts / Weaving</option>
+        <option value="food">Food Processing / Pickle-Papad</option>
+        <option value="agri">Agri-input / Seed Store</option>
+        <option value="mobile">Mobile Repair / Electronics</option>
+        <option value="beauty">Beauty Parlour / Salon</option>
+        <option value="other">Other</option>
+      </select>
+
+      <div class="grid2">
+        <div><label data-i18n="village"></label><input id="p_village" type="text" /></div>
+        <div><label data-i18n="district"></label><input id="p_district" type="text" placeholder="District, State"/></div>
+      </div>
+
+      <div class="grid2">
+        <div><label data-i18n="years"></label><input id="p_years" type="number" min="0"/></div>
+        <div><label data-i18n="revenue"></label><input id="p_revenue" type="number" min="0"/></div>
+      </div>
+
+      <label data-i18n="capital"></label>
+      <input id="p_capital" type="number" min="0"/>
+
+      <label data-i18n="challenge"></label>
+      <select id="p_challenge">
+        <option value="customers">Not enough customers</option>
+        <option value="workingcapital">Shortage of working capital</option>
+        <option value="rawmaterial">High cost of raw material</option>
+        <option value="credit">No access to formal credit</option>
+        <option value="competition">Competition from nearby town</option>
+        <option value="seasonal">Seasonal demand fluctuation</option>
+      </select>
+
+      <button class="btn" id="saveProfileBtn" data-i18n="saveProfile"></button>
+    </div>
+  </section>
+
+  <!-- ADVISOR TAB -->
+  <section class="tab-panel" id="tab-advisor">
+    <div class="card">
+      <h2 data-i18n="advisorHeading"></h2>
+      <div class="hint" data-i18n="advisorHint"></div>
+      <div id="chatLog"></div>
+      <div class="chat-input">
+        <input id="chatInput" type="text" data-i18n-ph="typeYourQuestion"/>
+        <button class="btn" id="chatSendBtn" data-i18n="send"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINANCIAL TAB -->
+  <section class="tab-panel" id="tab-financial">
+    <div class="card">
+      <h2 data-i18n="emiHeading"></h2>
+      <label data-i18n="loanAmount"></label>
+      <input id="f_amount" type="number" value="50000"/>
+      <div class="grid2">
+        <div><label data-i18n="interestRate"></label><input id="f_rate" type="number" value="12" step="0.1"/></div>
+        <div><label data-i18n="tenure"></label><input id="f_tenure" type="number" value="24"/></div>
+      </div>
+      <button class="btn" id="calcEmiBtn" data-i18n="calculateEmi"></button>
+      <div class="grid3" style="margin-top:14px;">
+        <div class="stat"><div class="val" id="emiVal">—</div><div class="lbl" data-i18n="monthlyEmi"></div></div>
+        <div class="stat"><div class="val" id="emiInterest">—</div><div class="lbl" data-i18n="totalInterest"></div></div>
+        <div class="stat"><div class="val" id="emiTotal">—</div><div class="lbl" data-i18n="totalRepayment"></div></div>
+      </div>
+    </div>
+
+    <!-- UPGRADED BREAK-EVEN & BUSINESS PROFITABILITY ANALYZER -->
+    <div class="card">
+      <h2 data-i18n="beTitle">Break-even & Business Profitability Analyzer</h2>
+      <div class="hint" data-i18n="beSubtitle">Understand how many units you need to sell, how much revenue you need, and when your business becomes profitable.</div>
+      
+      <!-- Collapsible Basic Inputs -->
+      <details class="be-group" open>
+        <summary>📌 BASIC INPUTS</summary>
+        <div class="grid2">
+          <div><label data-i18n="fixedCost">Fixed Monthly Costs (₹)</label><input id="b_fixed" type="number" value="6000"/></div>
+          <div><label data-i18n="variableCost">Variable Cost Per Unit (₹)</label><input id="b_var" type="number" value="20"/></div>
+        </div>
+        <div class="grid2">
+          <div><label data-i18n="sellingPrice">Selling Price Per Unit (₹)</label><input id="b_price" type="number" value="35"/></div>
+          <div><label data-i18n="expectedUnits">Expected Units Sold Per Month</label><input id="b_units" type="number" value="500"/></div>
+        </div>
+      </details>
+
+      <!-- Collapsible Advanced Inputs -->
+      <details class="be-group">
+        <summary>⚙️ ADVANCED INPUTS (Optional)</summary>
+        <div class="grid2">
+          <div><label data-i18n="lblInvestment">Initial Investment (₹)</label><input id="b_invest" type="number" value="50000"/></div>
+          <div><label data-i18n="lblDesiredProfit">Desired Monthly Profit (₹)</label><input id="b_desired_profit" type="number" value="5000"/></div>
+        </div>
+        <div class="grid2">
+          <div><label data-i18n="lblGrowth">Expected Monthly Growth Rate (%)</label><input id="b_growth" type="number" value="0"/></div>
+          <div><label data-i18n="lblWastage">Wastage / Unsold Percentage (%)</label><input id="b_wastage" type="number" value="0"/></div>
+        </div>
+        <div class="grid2">
+          <div><label data-i18n="lblOtherExp">Other Monthly Expenses (₹)</label><input id="b_otherexp" type="number" value="0"/></div>
+          <div><label data-i18n="lblTaxRate">Tax / Deduction Rate (%)</label><input id="b_tax" type="number" value="0"/></div>
+        </div>
+      </details>
+
+      <button class="btn" id="calcBreakEvenBtn" data-i18n="calculate">Calculate Analysis</button>
+      <div id="beErrorMsg" style="color:var(--danger);font-weight:bold;margin-top:10px;display:none;"></div>
+
+      <!-- Collapsible Results Dashboard -->
+      <details class="be-group" id="beResultsGroup" open style="margin-top:14px;">
+        <summary>📊 ANALYSIS RESULTS</summary>
+        <div style="margin-top:10px;text-align:center;">
+          <div id="beHealthBadge" class="health-badge profitable">🟢 PROFITABLE</div>
+          <div id="beHealthExplain" style="font-size:.9rem;color:var(--muted);margin-bottom:12px;"></div>
+        </div>
+
+        <div class="grid3">
+          <div class="stat"><div class="val" id="beUnits">—</div><div class="lbl" data-i18n="breakEvenUnits">Break-even Units</div></div>
+          <div class="stat"><div class="val" id="beRevenue">—</div><div class="lbl" data-i18n="lblBeRevenue">Break-even Revenue</div></div>
+          <div class="stat"><div class="val" id="beProfit">—</div><div class="lbl" data-i18n="monthlyProfit">Est. Monthly Profit</div></div>
+        </div>
+
+        <div class="grid3" style="margin-top:10px;">
+          <div class="stat"><div class="val" id="beMargin">—</div><div class="lbl" data-i18n="contributionMargin">Contribution Margin</div></div>
+          <div class="stat"><div class="val" id="beMarginPct">—</div><div class="lbl" data-i18n="lblContribPct">Contribution %</div></div>
+          <div class="stat"><div class="val" id="beProfitMarginPct">—</div><div class="lbl" data-i18n="lblProfitPct">Profit Margin %</div></div>
+        </div>
+
+        <div class="grid3" style="margin-top:10px;">
+          <div class="stat"><div class="val" id="beExpRevenue">—</div><div class="lbl" data-i18n="lblExpRevenue">Expected Revenue</div></div>
+          <div class="stat"><div class="val" id="beExpTotalCost">—</div><div class="lbl" data-i18n="lblTotalCost">Total Cost</div></div>
+          <div class="stat"><div class="val" id="beEffUnits">—</div><div class="lbl" data-i18n="lblEffUnits">Effective Sellable Units</div></div>
+        </div>
+
+        <div class="grid3" style="margin-top:10px;">
+          <div class="stat"><div class="val" id="beDesiredUnits">—</div><div class="lbl" data-i18n="lblDesiredUnits">Units for Desired Profit</div></div>
+          <div class="stat"><div class="val" id="beDesiredRevenue">—</div><div class="lbl" data-i18n="lblDesiredRevenue">Revenue for Desired Profit</div></div>
+          <div class="stat"><div class="val" id="beSafetyMargin">—</div><div class="lbl" data-i18n="lblSafetyMargin">Safety Margin</div></div>
+        </div>
+
+        <div class="grid2" style="margin-top:10px;">
+          <div class="stat"><div class="val" id="beSafetyPct">—</div><div class="lbl" data-i18n="lblSafetyPct">Safety Margin %</div></div>
+          <div class="stat"><div class="val" id="bePayback">—</div><div class="lbl" data-i18n="lblPayback">Payback Period</div></div>
+        </div>
+      </details>
+
+      <!-- Visualization Chart -->
+      <details class="be-group" open>
+        <summary>📈 BREAK-EVEN VISUALIZATION</summary>
+        <div class="be-chart-container">
+          <svg class="be-chart-svg" viewBox="0 0 400 200" id="beChartSvg">
+            <line x1="40" y1="170" x2="380" y2="170" stroke="#ccc" stroke-width="2"/>
+            <line x1="40" y1="20" x2="40" y2="170" stroke="#ccc" stroke-width="2"/>
+            <line id="lineCost" x1="40" y1="130" x2="360" y2="50" stroke="#c0392b" stroke-width="3"/>
+            <line id="lineRevenue" x1="40" y1="170" x2="360" y2="30" stroke="#1b7a3d" stroke-width="3"/>
+            <circle id="circleBE" cx="200" cy="90" r="6" fill="#e8721c"/>
+            <text id="textBE" x="210" y="85" font-size="12" font-weight="bold" fill="#e8721c">Break-even Point</text>
+            <text x="310" y="45" font-size="11" fill="#1b7a3d" font-weight="bold">Revenue</text>
+            <text x="310" y="65" font-size="11" fill="#c0392b" font-weight="bold">Total Cost</text>
+          </svg>
+        </div>
+      </details>
+
+      <!-- What-If Scenario Analysis -->
+      <details class="be-group" open>
+        <summary>🧪 BUSINESS WHAT-IF SIMULATOR</summary>
+        <label data-i18n="lblSelectScenario">Select What-If Scenario:</label>
+        <select id="beScenarioSelect">
+          <option value="A">Scenario A: Current Business</option>
+          <option value="B">Scenario B: Increase Selling Price (+10%)</option>
+          <option value="C">Scenario C: Reduce Variable Cost (-10%)</option>
+          <option value="D">Scenario D: Increase Monthly Sales (+20%)</option>
+          <option value="E">Scenario E: Reduce Fixed Costs (-10%)</option>
+        </select>
+
+        <div style="overflow-x:auto;margin-top:12px;">
+          <table class="cmp-table">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Current</th>
+                <th>Scenario</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Monthly Revenue</td><td id="sim_curr_rev">—</td><td id="sim_scen_rev">—</td></tr>
+              <tr><td>Total Costs</td><td id="sim_curr_cost">—</td><td id="sim_scen_cost">—</td></tr>
+              <tr><td>Monthly Profit</td><td id="sim_curr_profit">—</td><td id="sim_scen_profit">—</td></tr>
+              <tr><td>Break-even Units</td><td id="sim_curr_be">—</td><td id="sim_scen_be">—</td></tr>
+              <tr><td>Profit Margin %</td><td id="sim_curr_margin">—</td><td id="sim_scen_margin">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <!-- Business Recommendation -->
+      <div class="card" style="background:#eef6ee;border-color:#c2e0c2;margin-top:12px;margin-bottom:0;">
+        <h3 style="margin-top:0;color:var(--green-d);">💡 GraminSaathi Financial Insight</h3>
+        <p id="beInsightText" style="margin:0;font-size:0.95rem;color:var(--text);"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHEMES TAB -->
+  <section class="tab-panel" id="tab-schemes">
+    <div class="card">
+      <h2 data-i18n="schemesHeading"></h2>
+      <div class="disclaimer" data-i18n="schemesDisclaimer"></div>
+      <button class="btn ghost" id="rerunMatchBtn" data-i18n="rerunMatch"></button>
+      <div id="schemeResults" style="margin-top:12px;"></div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD TAB -->
+  <section class="tab-panel" id="tab-dashboard">
+    <div class="card">
+      <h2 data-i18n="dashboardHeading"></h2>
+      <div class="grid3">
+        <div class="stat"><div class="val" id="d_revenue">—</div><div class="lbl" data-i18n="monthlyRevenue"></div></div>
+        <div class="stat"><div class="val" id="d_capital">—</div><div class="lbl" data-i18n="ownCapital"></div></div>
+        <div class="stat"><div class="val" id="d_years">—</div><div class="lbl" data-i18n="yearsActive"></div></div>
+      </div>
+    </div>
+
+    <!-- Notes Dashboard Widget -->
+    <div class="card">
+      <h2>📝 <span data-i18n="notesWidgetHeading"></span></h2>
+      <div class="grid3" style="margin-bottom:12px;">
+        <div class="stat"><div class="val" id="w_totalNotes">0</div><div class="lbl" data-i18n="widgetSavedNotes"></div></div>
+        <div class="stat"><div class="val" id="w_pinnedNotes">0</div><div class="lbl" data-i18n="widgetPinnedNotes"></div></div>
+        <div class="stat" style="grid-column: span 1;"><div class="val" id="w_recentNoteDate" style="font-size:0.9rem;">—</div><div class="lbl" data-i18n="widgetRecentNote"></div></div>
+      </div>
+      <div id="w_recentNotePreview" style="font-style:italic;font-size:.9rem;color:var(--muted);margin-bottom:10px;"></div>
+      <button class="btn ghost" onclick="switchTab('notes')" data-i18n="viewAllNotesBtn"></button>
+    </div>
+
+    <div class="card" id="dashboardCompareCard" style="display:none;">
+      <h2>📊 <span data-i18n="dashboardCompareHeading"></span></h2>
+      <div id="dashboardCompareBody"></div>
+      <button class="btn ghost" id="dashboardCompareViewBtn" data-i18n="viewFullComparison"></button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="marketPulseHeading"></h2>
+      <div class="disclaimer" data-i18n="demoDataNote"></div>
+      <p id="marketPulseText" style="color:var(--muted);"></p>
+    </div>
+  </section>
+
+  <!-- BUSINESS COMPARISON TAB -->
+  <section class="tab-panel" id="tab-compare">
+    <div class="card">
+      <h2 data-i18n="compareHeading"></h2>
+      <div class="hint" data-i18n="compareHint"></div>
+      <div class="disclaimer" data-i18n="compareDisclaimer"></div>
+      <div id="compareCardsWrap" class="grid2"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+        <button class="btn secondary" id="addBusinessBtn">➕ <span data-i18n="addBusiness"></span></button>
+        <button class="btn" id="runCompareBtn">📊 <span data-i18n="runComparison"></span></button>
+      </div>
+    </div>
+
+    <div class="card" id="compareResultsCard" style="display:none;">
+      <h2 data-i18n="profitComparisonHeading"></h2>
+      <div class="flow-wrap" id="profitFlow"></div>
+      <canvas id="compareChart" width="640" height="280" style="width:100%;height:auto;max-width:640px;display:block;margin:0 auto;"></canvas>
+      <div class="card" style="background:#f7faf7;margin-top:14px;margin-bottom:0;">
+        <h3 style="margin-top:0;color:var(--green-d);" data-i18n="whatChangedHeading"></h3>
+        <div id="whatChanged"></div>
+      </div>
+    </div>
+
+    <div class="card" id="multiCompareCard" style="display:none;">
+      <h2 data-i18n="multiCompareHeading"></h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <button class="btn ghost sortBtn" data-sort="profit" data-i18n="sortHighestProfit"></button>
+        <button class="btn ghost sortBtn" data-sort="investment" data-i18n="sortLowestInvestment"></button>
+        <button class="btn ghost sortBtn" data-sort="ratio" data-i18n="sortBestRatio"></button>
+      </div>
+      <div style="overflow-x:auto;"><div id="multiCompareTableWrap"></div></div>
+    </div>
+
+    <div class="card" id="insightCard" style="display:none;">
+      <h2>🤖 <span data-i18n="insightHeading"></span></h2>
+      <p id="insightText" style="white-space:pre-line;"></p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn ghost" id="insightRepeatBtn">🔊 <span data-i18n="repeat"></span></button>
+        <button class="btn ghost" id="insightPauseBtn">⏸️ <span data-i18n="pause"></span></button>
+        <button class="btn ghost" id="insightAskBtn">🎙️ <span data-i18n="askAnotherQuestion"></span></button>
+      </div>
+    </div>
+
+    <div class="card" id="financeLinkCard" style="display:none;">
+      <h2 data-i18n="financingHeading"></h2>
+      <div id="financeLinkBody"></div>
+    </div>
+
+    <div class="card" id="decisionCard" style="display:none;background:#fff8ee;border-color:#f0d9a8;">
+      <h2>💡 <span data-i18n="decisionHeading"></span></h2>
+      <div id="decisionBody"></div>
+      <div class="disclaimer" style="margin-top:10px;" data-i18n="decisionDisclaimer"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- NOTE EDITOR MODAL -->
+<div class="modal-overlay hidden" id="noteModal">
+  <div class="modal-card">
+    <h2 id="modalNoteHeading" style="margin-top:0;color:var(--green-d);">📝 <span data-i18n="modalAddTitle"></span></h2>
+    <input type="hidden" id="modalNoteId" />
+    
+    <label data-i18n="noteTitleLbl"></label>
+    <input type="text" id="modalNoteTitle" data-i18n-ph="noteTitlePh" />
+
+    <label data-i18n="noteCategoryLbl"></label>
+    <select id="modalNoteCategory">
+      <option value="Business Idea" data-i18n="catIdea">Business Idea</option>
+      <option value="Important Instruction" data-i18n="catInstruction">Important Instruction</option>
+      <option value="Finance" data-i18n="catFinance">Finance</option>
+      <option value="Loan" data-i18n="catLoan">Loan</option>
+      <option value="Scheme" data-i18n="catScheme">Scheme</option>
+      <option value="Task" data-i18n="catTask">Task</option>
+      <option value="General" data-i18n="catGeneral" selected>General</option>
+    </select>
+
+    <label data-i18n="noteContentLbl"></label>
+    <textarea id="modalNoteContent" rows="6" data-i18n-ph="noteContentPh"></textarea>
+
+    <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+      <input type="checkbox" id="modalNotePinned" style="width:auto;" />
+      <label for="modalNotePinned" style="margin:0;cursor:pointer;">📌 <span data-i18n="pinNoteLbl"></span></label>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end;">
+      <button class="btn ghost" id="modalCancelBtn" data-i18n="cancelBtn"></button>
+      <button class="btn" id="modalSaveBtn" data-i18n="saveNoteBtn"></button>
+    </div>
+  </div>
+</div>
+
+<!-- MIC FAB -->
+<button class="mic-fab" id="micFab">🎙️</button>
+
+<!-- VOICE ASSISTANT PANEL -->
+<div class="voice-panel hidden" id="voicePanel">
+  <div class="voice-state" id="voiceState">🎙️ Listening…</div>
+  <div class="voice-transcript" id="voiceTranscript"></div>
+  <div class="voice-response" id="voiceResponse"></div>
+  <div class="voice-actions">
+    <button id="vaSpeakAgain">🎙️ <span data-i18n="speakAgain"></span></button>
+    <button id="vaRepeat">🔊 <span data-i18n="repeat"></span></button>
+    <button id="vaPause">⏸️ <span data-i18n="pause"></span></button>
+    <button id="vaConfirm">✅ <span data-i18n="confirm"></span></button>
+    <button class="close" id="vaClose">✖ <span data-i18n="closeWord"></span></button>
+  </div>
+</div>
+
+<!-- EASY VOICE WIZARD -->
+<div class="wizard hidden" id="easyWizard">
+  <button class="exit" id="wizardExit">✖</button>
+  <div class="q" id="wizardQ"></div>
+  <button class="bigmic" id="wizardMic">🎙️</button>
+  <div class="answer" id="wizardAnswer"></div>
+  <div class="row" id="wizardConfirmRow" style="display:none;">
+    <button class="yes" id="wizardYes">✅ <span data-i18n="yes"></span></button>
+    <button class="change" id="wizardChange">🔄 <span data-i18n="change"></span></button>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   GRAMINSAATHI — i18n + Voice + Digital Notes System
+   ===================================================================== */
+
+// ---------- 1. I18N ----------
+const I18N = {
+  en: {
+    changeLanguage:"Change Language", toggleEasyVoice:"Easy Voice Mode",
+    tabHome:"Home", tabNotes:"My Notes", tabProfile:"Profile", tabAdvisor:"Advisor", tabFinancial:"Financial", tabSchemes:"Schemes", tabDashboard:"Dashboard", tabCompare:"Compare",
+    
+    // Home Translations
+    homeTitle:"🌾 Welcome to GraminSaathi",
+    homeSubtitle:"Your digital partner for rural business growth, AI advisory, and smart note-taking.",
+    speakToSaathi:"Speak to Saathi",
+    digitalMemoryTitle:"Digital Memory",
+    digitalMemoryDesc:"Save important instructions, business ideas and reminders without writing them in a notebook.",
+    openMyNotes:"Open My Notes →",
+    aiAdvisorTitle:"AI Business Advisor",
+    aiAdvisorDesc:"Get instant answers on sales, loans, customers, and business strategy in your own language.",
+    askAdvisor:"Ask Advisor →",
+    financialCalculatorsTitle:"Financial Calculators",
+    financialCalculatorsDesc:"Calculate loan EMIs, break-even sales units, and monthly profits effortlessly.",
+    calcEmiProfit:"Calculate EMI & Profit →",
+    schemesTitle:"Government Schemes",
+    schemesDesc:"Find personalized subsidies, Mudra loans, and government support for your enterprise.",
+    findSchemes:"Find Schemes →",
+
+    // Notes Translations
+    notesSubtitle:"Remember it here. No need to write it in a book.",
+    flowSpeak:"Speak", flowSave:"Save", flowRemember:"Remember", flowAct:"Act",
+    forgetTitle:"Things you don't want to forget?",
+    forgetEx1:"• Remember to apply for the PMEGP scheme.",
+    forgetEx2:"• Ask supplier about bulk discount.",
+    forgetEx3:"• Check monthly shop expenses.",
+    forgetEx4:"• Call the bank regarding the loan.",
+    forgetEx5:"• Buy 20 kg raw material next Monday.",
+    addNoteBtn:"Add New Note",
+    speakNoteBtn:"Speak a Note",
+    searchNotesPh:"Search notes...",
+    catAll:"All Categories", catIdea:"Business Idea", catInstruction:"Important Instruction", catFinance:"Finance", catLoan:"Loan", catScheme:"Scheme", catTask:"Task", catGeneral:"General",
+    emptyNotesTitle:"Nothing saved yet",
+    emptyNotesDesc:"Write down an important instruction, business idea or reminder and keep it safely here.",
+    createFirstNoteBtn:"Create My First Note",
+    modalAddTitle:"Add New Note",
+    modalEditTitle:"Edit Note",
+    noteTitleLbl:"Title", noteTitlePh:"Enter note title...",
+    noteCategoryLbl:"Category",
+    noteContentLbl:"Note", noteContentPh:"Type your note content here or use voice...",
+    pinNoteLbl:"Pin this note",
+    saveNoteBtn:"Save Note", cancelBtn:"Cancel",
+    editBtn:"Edit", deleteBtn:"Delete", pinBtn:"Pin", unpinBtn:"Unpin",
+    widgetSavedNotes:"Saved Notes", widgetPinnedNotes:"Pinned Notes", widgetRecentNote:"Most Recent Note",
+    notesWidgetHeading:"Digital Memory Snapshot", viewAllNotesBtn:"View All Notes →",
+
+    profileHeading:"Tell us about your business", profileHint:"This context personalizes advisory, calculators and scheme matching.",
+    fillByVoice:"Fill Profile by Voice",
+    ownerName:"Owner name", businessType:"Business type", village:"Village / Town", district:"District / State",
+    years:"Years in operation", revenue:"Monthly revenue (₹, approx.)", capital:"Own capital available (₹)",
+    challenge:"Biggest current challenge", saveProfile:"Save Profile & Continue →",
+    editProfileBtn:"Edit Profile",
+
+    // Break-even Translations
+    beTitle:"Break-even & Business Profitability Analyzer",
+    beSubtitle:"Understand how many units you need to sell, how much revenue you need, and when your business becomes profitable.",
+    fixedCost:"Fixed monthly cost (₹)", variableCost:"Variable cost per unit (₹)",
+    sellingPrice:"Selling price per unit (₹)", expectedUnits:"Expected units sold / month", calculate:"Calculate Analysis",
+    breakEvenUnits:"Break-even units/month", monthlyProfit:"Est. monthly profit", contributionMargin:"Contribution margin",
+    lblInvestment:"Initial Investment (₹)", lblDesiredProfit:"Desired Monthly Profit (₹)", lblGrowth:"Expected Growth Rate (%)",
+    lblWastage:"Wastage / Unsold (%)", lblOtherExp:"Other Expenses (₹)", lblTaxRate:"Tax / Deduction Rate (%)",
+    lblBeRevenue:"Break-even Revenue", lblContribPct:"Contribution Margin %", lblProfitPct:"Profit Margin %",
+    lblExpRevenue:"Expected Monthly Revenue", lblTotalCost:"Expected Monthly Total Cost", lblEffUnits:"Effective Sellable Units",
+    lblDesiredUnits:"Units for Desired Profit", lblDesiredRevenue:"Revenue for Desired Profit", lblSafetyMargin:"Safety Margin",
+    lblSafetyPct:"Margin of Safety %", lblPayback:"Payback Period", lblSelectScenario:"Select What-If Scenario:",
+
+    advisorHeading:"AI Business Advisor", advisorHint:"Ask a question by typing, or tap the mic anywhere in the app.",
+    typeYourQuestion:"Type your question…", send:"Send",
+    emiHeading:"Loan EMI Calculator", loanAmount:"Loan amount (₹)", interestRate:"Annual interest rate (%)", tenure:"Tenure (months)",
+    calculateEmi:"Calculate EMI", monthlyEmi:"Monthly EMI", totalInterest:"Total Interest", totalRepayment:"Total Repayment",
+    schemesHeading:"Matched Government Schemes & Credit Lines",
+    schemesDisclaimer:"Matched against your saved profile. Scheme rules and eligibility change — verify on the official portal before applying.",
+    rerunMatch:"Re-run matching",
+    dashboardHeading:"Your Business Snapshot", monthlyRevenue:"Monthly Revenue", ownCapital:"Own Capital", yearsActive:"Years Active",
+    marketPulseHeading:"Hyper-local Market Pulse (demo data)", demoDataNote:"Prototype / Demo Data — connect a real mandi-price/weather/MSME feed in production.",
+    speakAgain:"Speak Again", confirm:"Confirm", repeat:"Repeat", pause:"Pause", closeWord:"Close",
+    yes:"Yes", change:"Change",
+    listening:"🎙️ Listening…", understanding:"🤖 Understanding…", speaking:"🔊 Speaking…",
+    micNotSupported:"Voice input isn't supported on this browser. Please try Chrome on Android, or type instead.",
+    isThisCorrect:"Is this correct?",
+    wizardQOwner:"What is your name?", wizardQType:"What business do you want to do or already run?",
+    wizardQVillage:"Which village or town are you in?", wizardQDistrict:"Which district and state?",
+    wizardQYears:"How many years have you been running this business? (say 0 if new)",
+    wizardQRevenue:"About how much do you earn per month, in rupees?",
+    wizardQCapital:"How much of your own money can you invest right now?",
+    wizardQChallenge:"What is your biggest problem right now — customers, money, raw material, loans, competition, or season?",
+    profileSaved:"Your profile has been saved.",
+    marketPulse:"Onion prices are up 8% this week in nearby mandis. Local demand for tailoring is rising ahead of the festival season.",
+    compareHeading:"📊 Business Performance Comparison", compareHint:"Compare your previous business with your current or proposed business before making a decision.",
+    compareDisclaimer:"Enter details manually or by voice. Estimates you enter here are Prototype Estimates, not verified data.",
+    addBusiness:"Add Another Business", runComparison:"Compare Now",
+    kindPrevious:"Previous Business", kindCurrent:"Current Business", kindProposed:"Proposed Business",
+    businessNameLbl:"Business name", cmpInvestment:"Investment (₹)", cmpRevenue:"Monthly Revenue (₹)", cmpExpenses:"Monthly Expenses (₹)",
+    cmpProfitAuto:"Monthly Profit (auto)", cmpCustomers:"Number of Customers", cmpNotes:"Main Challenges / Advantages",
+    cmpVoiceFill:"🎙️ Fill by Voice", removeBusiness:"Remove",
+    profitComparisonHeading:"📈 Profit Comparison", whatChangedHeading:"💡 What changed?",
+    multiCompareHeading:"Compare Multiple Businesses", sortHighestProfit:"Highest Profit", sortLowestInvestment:"Lowest Investment", sortBestRatio:"Best Profit-to-Investment Ratio",
+    insightHeading:"GraminSaathi Insight", askAnotherQuestion:"Ask Another Question",
+    financingHeading:"💳 Financing This Change", decisionHeading:"Business Decision Support",
+  },
+  hi: {
+    changeLanguage:"भाषा बदलें", toggleEasyVoice:"आसान वॉइस मोड",
+    tabHome:"होम", tabNotes:"मेरी नोट्स", tabProfile:"प्रोफ़ाइल", tabAdvisor:"सलाहकार", tabFinancial:"वित्तीय", tabSchemes:"योजनाएँ", tabDashboard:"डैशबोर्ड", tabCompare:"तुलना",
+    
+    // Home Translations (HI)
+    homeTitle:"🌾 ग्रामीणसाथी में आपका स्वागत है",
+    homeSubtitle:"ग्रामीण व्यवसाय वृद्धि, AI सलाह और डिजिटल नोट्स के लिए आपका साथी।",
+    speakToSaathi:"साथी से बात करें",
+    digitalMemoryTitle:"डिजिटल मेमोरी",
+    digitalMemoryDesc:"महत्वपूर्ण निर्देश, विचार और रिमाइंडर बिना कॉपी में लिखे सुरक्षित रखें।",
+    openMyNotes:"मेरी नोट्स खोलें →",
+    aiAdvisorTitle:"AI व्यवसाय सलाहकार",
+    aiAdvisorDesc:"अपनी भाषा में बिक्री, लोन, ग्राहक और व्यवसाय रणनीति पर तुरंत सलाह पाएं।",
+    askAdvisor:"सलाहकार से पूछें →",
+    financialCalculatorsTitle:"वित्तीय कैलकुलेटर",
+    financialCalculatorsDesc:"लोन EMI, ब्रेक-ईवन बिक्री और मासिक लाभ आसानी से निकालें।",
+    calcEmiProfit:"EMI और लाभ निकालें →",
+    schemesTitle:"सरकारी योजनाएं",
+    schemesDesc:"अपने उद्यम के लिए सब्सिडी, मुद्रा लोन और सरकारी सहायता खोजें।",
+    findSchemes:"योजनाएं खोजें →",
+
+    // Notes Translations (HI)
+    notesSubtitle:"यहाँ याद रखें। कॉपी में लिखने की ज़रूरत नहीं।",
+    flowSpeak:"बोलें", flowSave:"सेव करें", flowRemember:"याद रखें", flowAct:"कार्य करें",
+    forgetTitle:"चीजें जो आप भूलना नहीं चाहते?",
+    forgetEx1:"• PMEGP योजना के लिए आवेदन करना याद रखें।",
+    forgetEx2:"• सप्लायर से थोक छूट के बारे में पूछें।",
+    forgetEx3:"• दुकान के मासिक खर्चों की जांच करें।",
+    forgetEx4:"• लोन के संबंध में बैंक को कॉल करें।",
+    forgetEx5:"• अगले सोमवार 20 किग्रा कच्चा माल खरीदें।",
+    addNoteBtn:"नया नोट जोड़ें",
+    speakNoteBtn:"बोलकर नोट बनाएं",
+    searchNotesPh:"नोट्स खोजें...",
+    catAll:"सभी श्रेणियां", catIdea:"व्यवसाय विचार", catInstruction:"महत्वपूर्ण निर्देश", catFinance:"वित्त", catLoan:"ऋण/लोन", catScheme:"योजना", catTask:"कार्य/टास्क", catGeneral:"सामान्य",
+    emptyNotesTitle:"अभी कुछ भी सेव नहीं है",
+    emptyNotesDesc:"कोई महत्वपूर्ण निर्देश, विचार या रिमाइंडर लिखें और उसे यहाँ सुरक्षित रखें।",
+    createFirstNoteBtn:"पहला नोट बनाएं",
+    modalAddTitle:"नया नोट जोड़ें",
+    modalEditTitle:"नोट संपादित करें",
+    noteTitleLbl:"शीर्षक", noteTitlePh:"नोट का शीर्षक दर्ज करें...",
+    noteCategoryLbl:"श्रेणी",
+    noteContentLbl:"नोट विवरण", noteContentPh:"यहाँ अपना नोट लिखें या बोलें...",
+    pinNoteLbl:"इस नोट को पिन करें",
+    saveNoteBtn:"नोट सेव करें", cancelBtn:"रद्द करें",
+    editBtn:"संपादित करें", deleteBtn:"हटाएं", pinBtn:"पिन करें", unpinBtn:"अनपिन करें",
+    widgetSavedNotes:"कुल नोट्स", widgetPinnedNotes:"पिन किए गए नोट्स", widgetRecentNote:"हालिया नोट",
+    notesWidgetHeading:"डिजिटल मेमोरी स्नैपशॉट", viewAllNotesBtn:"सभी नोट्स देखें →",
+
+    profileHeading:"अपने व्यवसाय के बारे में बताएं", profileHint:"यह जानकारी सलाह, कैलकुलेटर और योजनाओं के मिलान को बेहतर बनाती है।",
+    fillByVoice:"आवाज़ से प्रोफ़ाइल भरें",
+    ownerName:"मालिक का नाम", businessType:"व्यवसाय का प्रकार", village:"गाँव / कस्बा", district:"ज़िला / राज्य",
+    years:"कितने वर्षों से चल रहा है", revenue:"मासिक आय (₹, लगभग)", capital:"आपकी अपनी पूंजी (₹)",
+    challenge:"सबसे बड़ी समस्या", saveProfile:"प्रोफ़ाइल सेव करें और आगे बढ़ें →",
+    editProfileBtn:"प्रोफ़ाइल संपादित करें",
+
+    // Break-even Translations (HI)
+    beTitle:"ब्रेक-ईवन एवं व्यावसायिक लाभप्रदता विश्लेषक",
+    beSubtitle:"समझें कि आपको कितनी इकाइयाँ बेचने की आवश्यकता है, कितना राजस्व चाहिए, और आपका व्यवसाय कब लाभदायक बनता है।",
+    fixedCost:"मासिक स्थिर लागत (₹)", variableCost:"प्रति इकाई परिवर्तनीय लागत (₹)",
+    sellingPrice:"प्रति इकाई विक्रय मूल्य (₹)", expectedUnits:"अनुमानित बिक्री / माह", calculate:"विश्लेषण की गणना करें",
+    breakEvenUnits:"ब्रेक-ईवन इकाइयाँ/माह", monthlyProfit:"अनुमानित मासिक लाभ", contributionMargin:"योगदान मार्जिन",
+    lblInvestment:"प्रारंभिक निवेश (₹)", lblDesiredProfit:"वांछित मासिक लाभ (₹)", lblGrowth:"अनुमानित वृद्धि दर (%)",
+    lblWastage:"अपव्यय / बिना बिका माल (%)", lblOtherExp:"अन्य मासिक खर्च (₹)", lblTaxRate:"कर / कटौती दर (%)",
+    lblBeRevenue:"ब्रेक-ईवन राजस्व", lblContribPct:"योगदान प्रतिशत %", lblProfitPct:"लाभ मार्जिन %",
+    lblExpRevenue:"अनुमानित मासिक राजस्व", lblTotalCost:"अनुमानित कुल लागत", lblEffUnits:"प्रभावी बिक्री योग्य इकाइयाँ",
+    lblDesiredUnits:"वांछित लाभ हेतु आवश्यक इकाइयाँ", lblDesiredRevenue:"वांछित लाभ हेतु आवश्यक राजस्व", lblSafetyMargin:"सुरक्षा मार्जिन",
+    lblSafetyPct:"सुरक्षा मार्जिन %", lblPayback:"पेबैक अवधि", lblSelectScenario:"परिदृश्य चुनें:",
+
+    advisorHeading:"AI व्यवसाय सलाहकार", advisorHint:"टाइप करके पूछें, या ऐप में कहीं भी माइक दबाएँ।",
+    typeYourQuestion:"अपना सवाल लिखें…", send:"भेजें",
+    emiHeading:"लोन EMI कैलकुलेटर", loanAmount:"लोन राशि (₹)", interestRate:"वार्षिक ब्याज दर (%)", tenure:"अवधि (महीने)",
+    calculateEmi:"EMI निकालें", monthlyEmi:"मासिक EMI", totalInterest:"कुल ब्याज", totalRepayment:"कुल चुकौती",
+    schemesHeading:"मिलान की गई सरकारी योजनाएँ और ऋण",
+    schemesDisclaimer:"आपकी प्रोफ़ाइल के आधार पर मिलान किया गया है। नियम बदलते रहते हैं — आवेदन से पहले आधिकारिक पोर्टल पर जांच लें।",
+    rerunMatch:"फिर से मिलान करें",
+    dashboardHeading:"आपका व्यवसाय स्नैपशॉट", monthlyRevenue:"मासिक आय", ownCapital:"अपनी पूंजी", yearsActive:"सक्रिय वर्ष",
+    marketPulseHeading:"स्थानीय बाज़ार की स्थिति (डेमो डेटा)", demoDataNote:"प्रोटोटाइप / डेमो डेटा — उत्पादन में असली मंडी-भाव/मौसम/MSME फ़ीड जोड़ें।",
+    speakAgain:"फिर बोलें", confirm:"पुष्टि करें", repeat:"दोहराएँ", pause:"रोकें", closeWord:"बंद करें",
+    yes:"हाँ", change:"बदलें",
+    listening:"🎙️ सुन रहा है…", understanding:"🤖 समझ रहा है…", speaking:"🔊 बोल रहा है…",
+    micNotSupported:"इस ब्राउज़र में आवाज़ इनपुट समर्थित नहीं है। कृपया Android पर Chrome आज़माएं, या टाइप करें।",
+    isThisCorrect:"क्या यह सही है?",
+    wizardQOwner:"आपका नाम क्या है?", wizardQType:"आप कौन सा व्यवसाय करना चाहते हैं या पहले से करते हैं?",
+    wizardQVillage:"आप किस गाँव या कस्बे में हैं?", wizardQDistrict:"कौन सा ज़िला और राज्य?",
+    wizardQYears:"आप कितने वर्षों से यह व्यवसाय चला रहे हैं? (नया है तो 0 कहें)",
+    wizardQRevenue:"आप महीने में लगभग कितना कमाते हैं, रुपयों में?",
+    wizardQCapital:"आप अभी अपनी कितनी पूंजी लगा सकते हैं?",
+    wizardQChallenge:"अभी आपकी सबसे बड़ी समस्या क्या है — ग्राहक, पैसा, कच्चा माल, लोन, प्रतिस्पर्धा, या मौसम?",
+    profileSaved:"आपकी प्रोफ़ाइल सेव कर दी गई है।",
+    marketPulse:"आसपास की मंडियों में प्याज़ के दाम इस हफ्ते 8% बढ़े हैं। त्योहारी सीज़न से पहले सिलाई की मांग बढ़ रही है।",
+    compareHeading:"📊 व्यवसाय प्रदर्शन तुलना", compareHint:"निर्णय लेने से पहले अपने पुराने व्यवसाय की तुलना अपने वर्तमान या प्रस्तावित व्यवसाय से करें।",
+    compareDisclaimer:"जानकारी मैन्युअल रूप से या आवाज़ से भरें।",
+    addBusiness:"एक और व्यवसाय जोड़ें", runComparison:"अभी तुलना करें",
+    kindPrevious:"पुराना व्यवसाय", kindCurrent:"वर्तमान व्यवसाय", kindProposed:"प्रस्तावित व्यवसाय",
+    businessNameLbl:"व्यवसाय का नाम", cmpInvestment:"निवेश (₹)", cmpRevenue:"मासिक आय (₹)", cmpExpenses:"मासिक खर्च (₹)",
+    cmpProfitAuto:"मासिक लाभ (स्वतः)", cmpCustomers:"ग्राहकों की संख्या", cmpNotes:"मुख्य समस्याएँ / फ़ायदे",
+    cmpVoiceFill:"🎙️ आवाज़ से भरें", removeBusiness:"हटाएं",
+    profitComparisonHeading:"📈 लाभ तुलना", whatChangedHeading:"💡 क्या बदला?",
+    multiCompareHeading:"कई व्यवसायों की तुलना करें", sortHighestProfit:"सबसे अधिक लाभ", sortLowestInvestment:"सबसे कम निवेश", sortBestRatio:"सर्वश्रेष्ठ लाभ-निवेश अनुपात",
+    insightHeading:"ग्रामीणसाथी सुझाव", askAnotherQuestion:"एक और सवाल पूछें",
+    financingHeading:"💳 इस बदलाव के लिए वित्तपोषण", decisionHeading:"व्यवसाय निर्णय सहायता",
+  },
+  te: {
+    changeLanguage:"భాష మార్చండి", toggleEasyVoice:"ఈజీ వాయిస్ మోడ్",
+    tabHome:"హోమ్", tabNotes:"నా నోట్స్", tabProfile:"ప్రొఫైల్", tabAdvisor:"సలహాదారు", tabFinancial:"ఆర్థిక", tabSchemes:"పథకాలు", tabDashboard:"డాష్‌బోర్డ్", tabCompare:"పోలిక",
+    
+    // Home Translations (TE)
+    homeTitle:"🌾 గ్రామిన్‌సాథికి స్వాగతం",
+    homeSubtitle:"గ్రామీణ వ్యాపారాభివృద్ధి, AI సలహాలు మరియు డిజిటల్ నోట్స్ కోసం మీ భాగస్వామి.",
+    speakToSaathi:"సాథితో మాట్లాడండి",
+    digitalMemoryTitle:"డిజిటల్ మెమరీ",
+    digitalMemoryDesc:"ముఖ్యమైన సూచనలు, వ్యాపార ఆలోచనలను పుస్తకంలో రాయకుండా డిజిటల్‌గా సేవ్ చేయండి.",
+    openMyNotes:"నా నోట్స్ తెరువు →",
+    aiAdvisorTitle:"AI వ్యాపార సలహాదారు",
+    aiAdvisorDesc:"అమ్మకాలు, రుణాలు, కస్టమర్లు మరియు వ్యాపార వ్యూహాలపై మీ భాషలోనే సలహాలు పొందండి.",
+    askAdvisor:"సలహాదారుని అడగండి →",
+    financialCalculatorsTitle:"ఆర్థిక కాలిక్యులేటర్లు",
+    financialCalculatorsDesc:"లోన్ EMI, బ్రేక్-ఈవెన్ అమ్మకాలు మరియు నెలవారీ లాభాలను సులభంగా లెక్కించండి.",
+    calcEmiProfit:"EMI & లాభం లెక్కించండి →",
+    schemesTitle:"ప్రభుత్వ పథకాలు",
+    schemesDesc:"మీ వ్యాపారానికి తగిన సబ్సిడీలు, ముద్ర రుణాలు మరియు ప్రభుత్వ సహాయాన్ని పొందండి.",
+    findSchemes:"పథకాలను వెతకండి →",
+
+    // Notes Translations (TE)
+    notesSubtitle:"ఇక్కడే గుర్తుంచుకోండి. పుస్తకంలో రాయాల్సిన అవసరం లేదు.",
+    flowSpeak:"మాట్లాడండి", flowSave:"సేవ్ చేయండి", flowRemember:"గుర్తుంచుకోండి", flowAct:"ఆచరించండి",
+    forgetTitle:"మీరు మర్చిపోకూడదు అనుకునే విషయాలు?",
+    forgetEx1:"• PMEGP పథకం కోసం దరఖాస్తు చేయడం గుర్తుంచుకోండి.",
+    forgetEx2:"• హోల్‌సేల్ డిస్కౌంట్ గురించి సప్లయర్‌ని అడగండి.",
+    forgetEx3:"• నెలవారీ షాపు ఖర్చులను తనిఖీ చేయండి.",
+    forgetEx4:"• లోన్ విషయమై బ్యాంకుకు కాల్ చేయండి.",
+    forgetEx5:"• వచ్చే సోమవారం 20 కేజీల ముడిసరుకు కొనండి.",
+    addNoteBtn:"కొత్త నోట్ జోడించు",
+    speakNoteBtn:"వాయిస్‌తో నోట్ చెప్పండి",
+    searchNotesPh:"నోట్స్ వెతకండి...",
+    catAll:"అన్ని వర్గాలు", catIdea:"వ్యాపార ఆలోచన", catInstruction:"ముఖ్యమైన సూచన", catFinance:"ఆర్థికం", catLoan:"రుణం/లోన్", catScheme:"పథకం", catTask:"టాస్క్/పని", catGeneral:"సాధారణం",
+    emptyNotesTitle:"ఇంకా ఏమీ సేవ్ చేయలేదు",
+    emptyNotesDesc:"ఒక ముఖ్యమైన సూచన, ఆలోచన లేదా రిమైండర్‌ని ఇక్కడ సురక్షితంగా రాసి ఉంచండి.",
+    createFirstNoteBtn:"నా మొదటి నోట్ చేయండి",
+    modalAddTitle:"కొత్త నోట్ జోడించు",
+    modalEditTitle:"నోట్ సవరించు",
+    noteTitleLbl:"శీర్షిక", noteTitlePh:"నోట్ శీర్షికను ఎంటర్ చేయండి...",
+    noteCategoryLbl:"వర్గం",
+    noteContentLbl:"నోట్ వివరాలు", noteContentPh:"ఇక్కడ టైప్ చేయండి లేదా మాట్లాడండి...",
+    pinNoteLbl:"ఈ నోట్‌ను పిన్ చేయండి",
+    saveNoteBtn:"నోట్ సేవ్ చేయండి", cancelBtn:"రద్దు చేయి",
+    editBtn:"సవరించు", deleteBtn:"తొలగించు", pinBtn:"పిన్ చేయి", unpinBtn:"అన్‌పిన్ చేయి",
+    widgetSavedNotes:"సేవ్ చేసిన నోట్స్", widgetPinnedNotes:"పిన్ చేసిన నోట్స్", widgetRecentNote:"ఇటీవలి నోట్",
+    notesWidgetHeading:"డిజిటల్ మెమరీ స్నాప్‌షాట్", viewAllNotesBtn:"అన్ని నోట్స్ చూడండి →",
+
+    profileHeading:"మీ వ్యాపారం గురించి చెప్పండి", profileHint:"ఇది సలహా, కాలిక్యులేటర్లు మరియు పథకాల సరిపోలికను మెరుగుపరుస్తుంది.",
+    fillByVoice:"వాయిస్‌తో ప్రొఫైల్ నింపండి",
+    ownerName:"యజమాని పేరు", businessType:"వ్యాపార రకం", village:"గ్రామం / పట్టణం", district:"జిల్లా / రాష్ట్రం",
+    years:"ఎన్ని సంవత్సరాలుగా నడుస్తోంది", revenue:"నెలవారీ ఆదాయం (₹, సుమారు)", capital:"మీ సొంత పెట్టుబడి (₹)",
+    challenge:"ప్రస్తుత అతి పెద్ద సమస్య", saveProfile:"ప్రొఫైల్ సేవ్ చేసి కొనసాగించండి →",
+    editProfileBtn:"ప్రొఫైల్‌ సవరించు",
+
+    // Break-even Translations (TE)
+    beTitle:"బ్రేక్-ఈవెన్ & బిజినెస్ ప్రాఫిటబిలిటీ ఎనలైజర్",
+    beSubtitle:"మీరు ఎన్ని యూనిట్లు అమ్మాలి, ఎంత ఆదాయం రాబట్టాలి మరియు మీ వ్యాపారం ఎప్పుడు లాభదాయకంగా మారుతుందో అర్థం చేసుకోండి.",
+    fixedCost:"నెలవారీ స్థిర ఖర్చు (₹)", variableCost:"యూనిట్‌కు మారే ఖర్చు (₹)",
+    sellingPrice:"యూనిట్‌కు అమ్మకపు ధర (₹)", expectedUnits:"అంచనా అమ్మకాలు / నెల", calculate:"విశ్లేషణ లెక్కించండి",
+    breakEvenUnits:"బ్రేక్-ఈవెన్ యూనిట్లు/నెల", monthlyProfit:"అంచనా నెలవారీ లాభం", contributionMargin:"కంట్రిబ్యూషన్ మార్జిన్",
+    lblInvestment:"ప్రారంభ పెట్టుబడి (₹)", lblDesiredProfit:"ఆశించిన నెలవారీ లాభం (₹)", lblGrowth:"అంచనా వృద్ధి రేటు (%)",
+    lblWastage:"వృధా / అమ్మడుపోనివి (%)", lblOtherExp:"ఇతర నెలవారీ ఖర్చులు (₹)", lblTaxRate:"పన్ను / తగ్గింపు రేటు (%)",
+    lblBeRevenue:"బ్రేక్-ఈవెన్ ఆదాయం", lblContribPct:"కంట్రిబ్యూషన్ మార్జిన్ %", lblProfitPct:"లాభం మార్జిన్ %",
+    lblExpRevenue:"అంచనా నెలవారీ ఆదాయం", lblTotalCost:"అంచనా మొత్తం ఖర్చు", lblEffUnits:"అమ్మకానికి అందుబాటులో ఉన్న యూనిట్లు",
+    lblDesiredUnits:"ఆశించిన లాభానికి కావాల్సిన యూనిట్లు", lblDesiredRevenue:"ఆశించిన లాభానికి కావాల్సిన ఆదాయం", lblSafetyMargin:"సేఫ్టీ మార్జిన్",
+    lblSafetyPct:"మార్జిన్ ఆఫ్ సేఫ్టీ %", lblPayback:"పెట్టుబడి తిరిగొచ్చే కాలం", lblSelectScenario:"సినారియో ఎంచుకోండి:",
+
+    advisorHeading:"AI వ్యాపార సలహాదారు", advisorHint:"టైప్ చేసి అడగండి, లేదా యాప్‌లో ఎక్కడైనా మైక్ నొక్కండి.",
+    typeYourQuestion:"మీ ప్రశ్న టైప్ చేయండి…", send:"పంపండి",
+    emiHeading:"లోన్ EMI కాలిక్యులేటర్", loanAmount:"లోన్ మొత్తం (₹)", interestRate:"వార్షిక వడ్డీ రేటు (%)", tenure:"కాలవ్యవధి (నెలలు)",
+    calculateEmi:"EMI లెక్కించండి", monthlyEmi:"నెలవారీ EMI", totalInterest:"మొత్తం వడ్డీ", totalRepayment:"మొత్తం చెల్లింపు",
+    schemesHeading:"సరిపోలిన ప్రభుత్వ పథకాలు & రుణాలు",
+    schemesDisclaimer:"మీ ప్రొఫైల్ ఆధారంగా సరిపోల్చబడింది. నిబంధనలు మారుతూ ఉంటాయి — దరఖాస్తుకు ముందు అధికారిక పోర్టల్‌లో నిర్ధారించుకోండి.",
+    rerunMatch:"మళ్ళీ సరిపోల్చండి",
+    dashboardHeading:"మీ వ్యాపార స్నాప్‌షాట్", monthlyRevenue:"నెలవారీ ఆదాయం", ownCapital:"సొంత పెట్టుబడి", yearsActive:"క్రియాశీల సంవత్సరాలు",
+    marketPulseHeading:"స్థానిక మార్కెట్ పరిస్థితి (డెమో డేటా)", demoDataNote:"ప్రోటోటైప్ / డెమో డేటా — ప్రొడక్షన్ లో నిజమైన మండి-ధరలు/వాతావరణం/MSME ఫీడ్ కలపండి.",
+    speakAgain:"మళ్ళీ మాట్లాడండి", confirm:"నిర్ధారించండి", repeat:"మళ్ళీ చెప్పు", pause:"ఆపు", closeWord:"మూసివేయి",
+    yes:"అవును", change:"మార్చు",
+    listening:"🎙️ వింటోంది…", understanding:"🤖 అర్థం చేసుకుంటోంది…", speaking:"🔊 మాట్లాడుతోంది…",
+    micNotSupported:"ఈ బ్రౌజర్‌లో వాయిస్ ఇన్‌పుట్ లేదు. దయచేసి Android లో Chrome వాడండి, లేదా టైప్ చేయండి.",
+    isThisCorrect:"ఇది సరైనదేనా?",
+    wizardQOwner:"మీ పేరు ఏమిటి?", wizardQType:"మీరు ఏ వ్యాపారం చేయాలనుకుంటున్నారు లేదా ఇప్పటికే చేస్తున్నారు?",
+    wizardQVillage:"మీరు ఏ గ్రామం లేదా పట్టణంలో ఉన్నారు?", wizardQDistrict:"ఏ జిల్లా మరియు రాష్ట్రం?",
+    wizardQYears:"మీరు ఎన్ని సంవత్సరాలుగా ఈ వ్యాపారం చేస్తున్నారు? (కొత్తదైతే 0 చెప్పండి)",
+    wizardQRevenue:"మీరు నెలకు సుమారు ఎంత సంపాదిస్తారు, రూపాయల్లో?",
+    wizardQCapital:"మీరు ఇప్పుడు మీ సొంతంగా ఎంత పెట్టుబడి పెట్టగలరు?",
+    wizardQChallenge:"ఇప్పుడు మీ అతిపెద్ద సమస్య ఏమిటి — కస్టమర్లు, డబ్బు, ముడిసరుకు, రుణాలు, పోటీ, లేదా సీజన్?",
+    profileSaved:"మీ ప్రొఫైల్ సేవ్ చేయబడింది.",
+    marketPulse:"సమీప మండీలలో ఉల్లిపాయ ధరలు ఈ వారం 8% పెరిగాయి. పండుగ సీజన్‌కు ముందు టైలరింగ్‌కు డిమాండ్ పెరుగుతోంది.",
+    compareHeading:"📊 వ్యాపార పనితీరు పోలిక", compareHint:"నిర్ణయం తీసుకునే ముందు మీ పాత వ్యాపారాన్ని మీ ప్రస్తుత లేదా ప్రతిపాదిత వ్యాపారంతో పోల్చండి.",
+    compareDisclaimer:"వివరాలను మాన్యువల్‌గా లేదా వాయిస్ ద్వారా నమోదు చేయండి.",
+    addBusiness:"మరొక వ్యాపారం జోడించండి", runComparison:"ఇప్పుడు పోల్చండి",
+    kindPrevious:"పాత వ్యాపారం", kindCurrent:"ప్రస్తుత వ్యాపారం", kindProposed:"ప్రతిపాదిత వ్యాపారం",
+    businessNameLbl:"వ్యాపార పేరు", cmpInvestment:"పెట్టుబడి (₹)", cmpRevenue:"నెలవారీ ఆదాయం (₹)", cmpExpenses:"నెలవారీ ఖర్చులు (₹)",
+    cmpProfitAuto:"నెలవారీ లాభం (ఆటో)", cmpCustomers:"కస్టమర్ల సంఖ్య", cmpNotes:"ప్రధాన సమస్యలు / ప్రయోజనాలు",
+    cmpVoiceFill:"🎙️ వాయిస్‌తో నింపండి", removeBusiness:"తీసివేయండి",
+    profitComparisonHeading:"📈 లాభ పోలిక", whatChangedHeading:"💡 ఏమి మారింది?",
+    multiCompareHeading:"బహుళ వ్యాపారాలను పోల్చండి", sortHighestProfit:"అత్యధిక లాభం", sortLowestInvestment:"అత్యల్ప పెట్టుబడి", sortBestRatio:"ఉత్తమ లాభ-పెట్టుబడి నిష్పత్తి",
+    insightHeading:"గ్రామిన్‌సాథి సలహా", askAnotherQuestion:"మరో ప్రశ్న అడగండి",
+    financingHeading:"💳 ఈ మార్పు కోసం ఆర్థిక సహాయం", decisionHeading:"వ్యాపార నిర్ణయ మద్దతు",
+  }
+};
+
+// ---------- 1b. LANGUAGE CATALOG ----------
+const LANGUAGES = [
+  { code:"en", native:"English", eng:"English", priority:true, speech:"en-IN" },
+  { code:"te", native:"తెలుగు", eng:"Telugu", priority:true, speech:"te-IN" },
+  { code:"hi", native:"हिन्दी", eng:"Hindi", priority:true, speech:"hi-IN" },
+  { code:"ta", native:"தமிழ்", eng:"Tamil", priority:true, speech:"ta-IN" },
+  { code:"kn", native:"ಕನ್ನಡ", eng:"Kannada", priority:true, speech:"kn-IN" },
+  { code:"ml", native:"മലയാളം", eng:"Malayalam", priority:true, speech:"ml-IN" },
+  { code:"mr", native:"मराठी", eng:"Marathi", priority:true, speech:"mr-IN" },
+  { code:"bn", native:"বাংলা", eng:"Bengali", priority:true, speech:"bn-IN" },
+  { code:"gu", native:"ગુજરાતી", eng:"Gujarati", priority:true, speech:"gu-IN" },
+  { code:"pa", native:"ਪੰਜਾਬੀ", eng:"Punjabi", priority:true, speech:"pa-IN" },
+  { code:"or", native:"ଓଡ଼ିଆ", eng:"Odia", priority:true, speech:"or-IN" },
+  { code:"as", native:"অসমীয়া", eng:"Assamese", priority:true, speech:"as-IN" },
+  { code:"ur", native:"اردو", eng:"Urdu", priority:true, speech:"ur-IN" },
+];
+const SPEECH_LANG = LANGUAGES.reduce((m,l)=>{ if(l.speech) m[l.code]=l.speech; return m; }, {});
+
+function renderLanguagePickers(filter){
+  const q = (filter||"").trim().toLowerCase();
+  const matches = (l)=> !q || l.native.toLowerCase().includes(q) || l.eng.toLowerCase().includes(q) || l.code.toLowerCase().includes(q);
+  const makeBtn = (l)=> `<button data-lang="${l.code}" class="${matches(l)?"":"hide"}"><span class="native">${l.native}</span><span class="eng">${l.eng}</span></button>`;
+  document.getElementById("langButtonsPriority").innerHTML = LANGUAGES.filter(l=>l.priority).map(makeBtn).join("");
+  document.getElementById("langButtonsMore").innerHTML = LANGUAGES.filter(l=>!l.priority).map(makeBtn).join("");
+  document.querySelectorAll("#langOverlay .lang-buttons button").forEach(btn=>{
+    btn.addEventListener("click", ()=> setLanguage(btn.getAttribute("data-lang")));
+  });
+}
+renderLanguagePickers("");
+document.getElementById("langSearchInput").addEventListener("input", (e)=> renderLanguagePickers(e.target.value));
+
+// ---------- 2. APP STATE ----------
+const APP = {
+  lang: localStorage.getItem("gs_lang") || null,
+  profile: JSON.parse(localStorage.getItem("gs_profile") || "null") || {},
+  easyVoice: localStorage.getItem("gs_easyvoice") === "1",
+  notes: JSON.parse(localStorage.getItem("graminsaathi_notes") || "[]")
+};
+
+function t(key){ return (I18N[APP.lang] && I18N[APP.lang][key]) || I18N.en[key] || key; }
+
+function applyTranslations(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent = t(el.getAttribute("data-i18n")); });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el=>{ el.placeholder = t(el.getAttribute("data-i18n-ph")); });
+}
+
+function setLanguage(lang){
+  APP.lang = lang;
+  localStorage.setItem("gs_lang", lang);
+  document.getElementById("langOverlay").style.display = "none";
+  applyTranslations();
+  renderSchemes();
+  renderNotes();
+  updateNotesWidget();
+  document.getElementById("marketPulseText").textContent = t("marketPulse");
+}
+
+if(APP.lang){
+  document.getElementById("langOverlay").style.display = "none";
+}
+applyTranslations();
+
+// Settings & Header Controls
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsMenu = document.getElementById("settingsMenu");
+const headerProfileBtn = document.getElementById("headerProfileBtn");
+const profileDropdown = document.getElementById("profileDropdown");
+
+settingsBtn.addEventListener("click", (e)=>{
+  e.stopPropagation();
+  profileDropdown.classList.remove("open");
+  settingsMenu.classList.toggle("open");
+});
+
+headerProfileBtn.addEventListener("click", (e)=>{
+  e.stopPropagation();
+  settingsMenu.classList.remove("open");
+  updateProfileDropdownData();
+  profileDropdown.classList.toggle("open");
+});
+
+document.addEventListener("click", ()=>{
+  settingsMenu.classList.remove("open");
+  profileDropdown.classList.remove("open");
+});
+
+document.getElementById("dp_editBtn").addEventListener("click", ()=>{
+  profileDropdown.classList.remove("open");
+  switchTab("profile");
+});
+
+function updateProfileDropdownData(){
+  const p = APP.profile;
+  document.getElementById("dp_owner").textContent = p.owner || "Guest User";
+  document.getElementById("dp_btype").textContent = p.btype || "Not Set";
+  document.getElementById("dp_location").textContent = (p.village || p.district) ? `${p.village||''}, ${p.district||''}`.replace(/^,\s*|\s*,\s*$/g,'') : "Not Set";
+}
+
+document.getElementById("changeLangBtn").addEventListener("click", ()=>{
+  document.getElementById("langOverlay").style.display = "flex";
+  settingsMenu.classList.remove("open");
+});
+function refreshEasyVoiceLabel(){
+  document.getElementById("easyVoiceState").textContent = APP.easyVoice ? "On" : "Off";
+}
+document.getElementById("easyVoiceToggleBtn").addEventListener("click", ()=>{
+  APP.easyVoice = !APP.easyVoice;
+  localStorage.setItem("gs_easyvoice", APP.easyVoice ? "1":"0");
+  refreshEasyVoiceLabel();
+  settingsMenu.classList.remove("open");
+});
+refreshEasyVoiceLabel();
+
+// Tab Switching
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=> switchTab(btn.getAttribute("data-tab")));
+});
+function switchTab(name){
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active", b.getAttribute("data-tab")===name));
+  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("active", p.id === "tab-"+name));
+  if(name === "notes"){
+    renderNotes();
+  }
+}
+
+// Home button handlers
+document.getElementById("openNotesFromHomeBtn").addEventListener("click", ()=> switchTab("notes"));
+document.getElementById("homeVoiceStartBtn").addEventListener("click", ()=>{
+  openVoicePanel();
+  startListening();
+});
+
+// ---------- 3. MY DIGITAL NOTES FEATURE ----------
+function saveNotesToStorage(){
+  localStorage.setItem("graminsaathi_notes", JSON.stringify(APP.notes));
+  updateNotesWidget();
+}
+
+function sanitizeHTML(str) {
+  const temp = document.createElement('div');
+  temp.textContent = str || '';
+  return temp.innerHTML;
+}
+
+function formatNoteDate(isoString) {
+  if(!isoString) return '';
+  const d = new Date(isoString);
+  return d.toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function renderNotes() {
+  const container = document.getElementById("notesContainer");
+  const searchQuery = (document.getElementById("noteSearchInput").value || "").toLowerCase();
+  const catFilter = document.getElementById("noteCatFilter").value;
+
+  let filtered = APP.notes.filter(n => {
+    const matchesSearch = n.title.toLowerCase().includes(searchQuery) || n.content.toLowerCase().includes(searchQuery);
+    const matchesCat = (catFilter === "ALL") || (n.category === catFilter);
+    return matchesSearch && matchesCat;
+  });
+
+  filtered.sort((a, b) => {
+    if (a.pinned !== b.pinned) return b.pinned ? 1 : -1;
+    return new Date(b.updatedAt) - new Date(a.updatedAt);
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty-notes">
+        <div class="icon">📝</div>
+        <h3>${t("emptyNotesTitle")}</h3>
+        <p>${t("emptyNotesDesc")}</p>
+        <button class="btn" onclick="openNoteModal()">${t("createFirstNoteBtn")}</button>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(n => {
+    const isPinned = n.pinned;
+    return `
+      <div class="note-card ${isPinned ? 'pinned' : ''}">
+        <div class="note-card-header">
+          <h3 class="note-card-title">${isPinned ? '📌 ' : ''}${sanitizeHTML(n.title || 'Untitled')}</h3>
+          <span class="note-cat-badge">${sanitizeHTML(n.category)}</span>
+        </div>
+        <div class="note-card-date">${formatNoteDate(n.updatedAt)}</div>
+        <div class="note-card-preview">${sanitizeHTML(n.content)}</div>
+        <div class="note-card-actions">
+          <button onclick="togglePinNote('${n.id}')">
+            ${isPinned ? '📌 ' + t("unpinBtn") : '📌 ' + t("pinBtn")}
+          </button>
+          <button onclick="openNoteModal('${n.id}')">✏️ ${t("editBtn")}</button>
+          <button onclick="deleteNote('${n.id}')" style="color:var(--danger)">🗑️ ${t("deleteBtn")}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+document.getElementById("noteSearchInput").addEventListener("input", renderNotes);
+document.getElementById("noteCatFilter").addEventListener("change", renderNotes);
+
+function openNoteModal(id = null) {
+  const modal = document.getElementById("noteModal");
+  modal.classList.remove("hidden");
+
+  if (id) {
+    const note = APP.notes.find(n => n.id === id);
+    if (note) {
+      document.getElementById("modalNoteHeading").innerHTML = `📝 ${t("modalEditTitle")}`;
+      document.getElementById("modalNoteId").value = note.id;
+      document.getElementById("modalNoteTitle").value = note.title;
+      document.getElementById("modalNoteCategory").value = note.category;
+      document.getElementById("modalNoteContent").value = note.content;
+      document.getElementById("modalNotePinned").checked = !!note.pinned;
+      return;
+    }
+  }
+
+  document.getElementById("modalNoteHeading").innerHTML = `📝 ${t("modalAddTitle")}`;
+  document.getElementById("modalNoteId").value = "";
+  document.getElementById("modalNoteTitle").value = "";
+  document.getElementById("modalNoteCategory").value = "General";
+  document.getElementById("modalNoteContent").value = "";
+  document.getElementById("modalNotePinned").checked = false;
+}
+
+function closeNoteModal() {
+  document.getElementById("noteModal").classList.add("hidden");
+}
+
+document.getElementById("addNewNoteBtn").addEventListener("click", () => openNoteModal());
+document.getElementById("modalCancelBtn").addEventListener("click", closeNoteModal);
+
+document.getElementById("modalSaveBtn").addEventListener("click", () => {
+  const id = document.getElementById("modalNoteId").value;
+  const title = document.getElementById("modalNoteTitle").value.trim() || "Untitled Note";
+  const category = document.getElementById("modalNoteCategory").value;
+  const content = document.getElementById("modalNoteContent").value.trim();
+  const pinned = document.getElementById("modalNotePinned").checked;
+  const now = new Date().toISOString();
+
+  if (id) {
+    const idx = APP.notes.findIndex(n => n.id === id);
+    if (idx !== -1) {
+      APP.notes[idx] = { ...APP.notes[idx], title, category, content, pinned, updatedAt: now };
+    }
+  } else {
+    const newNote = {
+      id: "note_" + Date.now() + "_" + Math.random().toString(36).substr(2, 4),
+      title,
+      category,
+      content,
+      pinned,
+      createdAt: now,
+      updatedAt: now
+    };
+    APP.notes.push(newNote);
+  }
+
+  saveNotesToStorage();
+  closeNoteModal();
+  renderNotes();
+});
+
+function deleteNote(id) {
+  if (confirm("Are you sure you want to delete this note?")) {
+    APP.notes = APP.notes.filter(n => n.id !== id);
+    saveNotesToStorage();
+    renderNotes();
+  }
+}
+
+function togglePinNote(id) {
+  const note = APP.notes.find(n => n.id === id);
+  if (note) {
+    note.pinned = !note.pinned;
+    note.updatedAt = new Date().toISOString();
+    saveNotesToStorage();
+    renderNotes();
+  }
+}
+
+document.getElementById("speakNoteBtn").addEventListener("click", () => {
+  openNoteModal();
+  const r = getRecognition();
+  if (!r) {
+    alert(t("micNotSupported"));
+    return;
+  }
+  
+  const contentArea = document.getElementById("modalNoteContent");
+  contentArea.placeholder = t("listening");
+  
+  r.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    contentArea.value = (contentArea.value ? contentArea.value + "\n" : "") + transcript;
+    contentArea.placeholder = t("noteContentPh");
+  };
+  r.onerror = () => { contentArea.placeholder = t("noteContentPh"); };
+  r.start();
+});
+
+function updateNotesWidget() {
+  const total = APP.notes.length;
+  const pinned = APP.notes.filter(n => n.pinned).length;
+  
+  document.getElementById("w_totalNotes").textContent = total;
+  document.getElementById("w_pinnedNotes").textContent = pinned;
+
+  if (total > 0) {
+    const sorted = [...APP.notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    const recent = sorted[0];
+    document.getElementById("w_recentNoteDate").textContent = formatNoteDate(recent.updatedAt);
+    document.getElementById("w_recentNotePreview").textContent = `"${recent.title}" — ${recent.content.substring(0, 45)}${recent.content.length > 45 ? '...' : ''}`;
+  } else {
+    document.getElementById("w_recentNoteDate").textContent = "—";
+    document.getElementById("w_recentNotePreview").textContent = t("emptyNotesTitle");
+  }
+}
+updateNotesWidget();
+
+// ---------- 4. PROFILE ----------
+function loadProfileIntoForm(){
+  const p = APP.profile;
+  if(!p) return;
+  if(p.owner) document.getElementById("p_owner").value = p.owner;
+  if(p.btype) document.getElementById("p_btype").value = p.btype;
+  if(p.village) document.getElementById("p_village").value = p.village;
+  if(p.district) document.getElementById("p_district").value = p.district;
+  if(p.years!=null) document.getElementById("p_years").value = p.years;
+  if(p.revenue!=null) document.getElementById("p_revenue").value = p.revenue;
+  if(p.capital!=null) document.getElementById("p_capital").value = p.capital;
+  if(p.challenge) document.getElementById("p_challenge").value = p.challenge;
+}
+loadProfileIntoForm();
+
+document.getElementById("saveProfileBtn").addEventListener("click", ()=>{
+  APP.profile = {
+    owner: document.getElementById("p_owner").value,
+    btype: document.getElementById("p_btype").value,
+    village: document.getElementById("p_village").value,
+    district: document.getElementById("p_district").value,
+    years: Number(document.getElementById("p_years").value)||0,
+    revenue: Number(document.getElementById("p_revenue").value)||0,
+    capital: Number(document.getElementById("p_capital").value)||0,
+    challenge: document.getElementById("p_challenge").value,
+  };
+  localStorage.setItem("gs_profile", JSON.stringify(APP.profile));
+  updateDashboard();
+  renderSchemes();
+  updateProfileDropdownData();
+  speak(t("profileSaved"));
+  switchTab("dashboard");
+});
+
+function updateDashboard(){
+  document.getElementById("d_revenue").textContent = APP.profile.revenue ? "₹"+APP.profile.revenue.toLocaleString("en-IN") : "—";
+  document.getElementById("d_capital").textContent = APP.profile.capital ? "₹"+APP.profile.capital.toLocaleString("en-IN") : "—";
+  document.getElementById("d_years").textContent = APP.profile.years!=null ? APP.profile.years : "—";
+}
+updateDashboard();
+document.getElementById("marketPulseText").textContent = APP.lang ? t("marketPulse") : "";
+
+// ---------- 5. ADVISOR ----------
+function getAdvisorReply(message){
+  const p = APP.profile;
+  const msg = (message||"").toLowerCase();
+  const capital = extractAmount(msg) || p.capital || 0;
+
+  if(/business|వ్యాపారం|व्यवसाय|start|shall i do/i.test(msg)){
+    let suggestion;
+    if(capital < 15000) suggestion = { en:"a small tailoring stall or mobile snacks cart", hi:"छोटी सिलाई दुकान या स्नैक्स कार्ट", te:"చిన్న టైలరింగ్ లేదా స్నాక్స్ కార్ట్" };
+    else if(capital < 75000) suggestion = { en:"a kirana store, dairy collection point, or agri counter", hi:"किराना दुकान या डेयरी केंद्र", te:"కిరాణా దుకాణం లేదా పాడి కేంద్రం" };
+    else suggestion = { en:"a food-processing unit, poultry farm, or expanded retail shop", hi:"फूड-प्रोसेसिंग यूनिट या बड़ी दुकान", te:"ఫుడ్ ప్రాసెసింగ్ లేదా పెద్ద దుకాణం" };
+    const capText = capital ? ` (₹${capital.toLocaleString("en-IN")})` : "";
+    return `With your capital${capText}, ${suggestion[APP.lang]||suggestion.en} is a good fit. Start small, track sales, and grow safely.`;
+  }
+
+  if(/emi|loan|ऋण|किस्त|రుణం|వాయిదా/.test(msg)){
+    return handleFinancialVoiceIntent(msg);
+  }
+
+  if(/note|remember|save|నోట్|याद|सेव/.test(msg)){
+    switchTab("notes");
+    return "Opening My Notes so you can save this instruction safely.";
+  }
+
+  return "I am here to help with your business decisions, calculations, schemes, and digital notes.";
+}
+
+document.getElementById("chatSendBtn").addEventListener("click", sendChat);
+document.getElementById("chatInput").addEventListener("keydown", e=>{ if(e.key==="Enter") sendChat(); });
+function sendChat(){
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+  if(!text) return;
+  appendChat(text, "user");
+  const reply = getAdvisorReply(text);
+  appendChat(reply, "bot");
+  speak(reply);
+  input.value = "";
+}
+function appendChat(text, who){
+  const log = document.getElementById("chatLog");
+  const div = document.createElement("div");
+  div.className = "msg " + who;
+  div.textContent = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+// ---------- 6. FINANCIAL CALCULATORS ----------
+function calcEMI(P, annualRate, months){
+  const r = annualRate/12/100;
+  if(r === 0) return P/months;
+  return P * r * Math.pow(1+r, months) / (Math.pow(1+r, months) - 1);
+}
+document.getElementById("calcEmiBtn").addEventListener("click", ()=>{
+  const P = Number(document.getElementById("f_amount").value)||0;
+  const rate = Number(document.getElementById("f_rate").value)||0;
+  const months = Number(document.getElementById("f_tenure").value)||1;
+  const emi = calcEMI(P, rate, months);
+  const total = emi*months;
+  const interest = total - P;
+  document.getElementById("emiVal").textContent = "₹"+Math.round(emi).toLocaleString("en-IN");
+  document.getElementById("emiInterest").textContent = "₹"+Math.round(interest).toLocaleString("en-IN");
+  document.getElementById("emiTotal").textContent = "₹"+Math.round(total).toLocaleString("en-IN");
+});
+
+// Comprehensive Break-even Engine
+function runBreakEvenCalculation(params) {
+  const fixed = Math.max(0, Number(params.fixed) || 0);
+  const varCost = Math.max(0, Number(params.varCost) || 0);
+  const price = Math.max(0, Number(params.price) || 0);
+  const expectedUnits = Math.max(0, Number(params.expectedUnits) || 0);
+  const investment = Math.max(0, Number(params.investment) || 0);
+  const desiredProfit = Math.max(0, Number(params.desiredProfit) || 0);
+  const wastage = Math.max(0, Math.min(100, Number(params.wastage) || 0));
+  const otherExp = Math.max(0, Number(params.otherExp) || 0);
+  const taxRate = Math.max(0, Math.min(100, Number(params.taxRate) || 0));
+
+  if (price <= varCost) {
+    return { error: "Selling price must be greater than variable cost per unit." };
+  }
+
+  const effUnits = expectedUnits * (1 - wastage / 100);
+  const contribMargin = price - varCost;
+  const contribMarginPct = price > 0 ? (contribMargin / price) * 100 : 0;
+
+  const totalFixed = fixed + otherExp;
+  const beUnits = contribMargin > 0 ? Math.ceil(totalFixed / contribMargin) : Infinity;
+  const beRevenue = beUnits * price;
+
+  const expRevenue = effUnits * price;
+  const expVarCost = effUnits * varCost;
+  const totalCostBeforeTax = totalFixed + expVarCost;
+  const grossProfit = expRevenue - totalCostBeforeTax;
+
+  let netProfit = grossProfit;
+  if (grossProfit > 0 && taxRate > 0) {
+    netProfit = grossProfit * (1 - taxRate / 100);
+  }
+
+  const profitMarginPct = expRevenue > 0 ? (netProfit / expRevenue) * 100 : 0;
+  const unitsForDesired = contribMargin > 0 ? Math.ceil((totalFixed + desiredProfit) / contribMargin) : Infinity;
+  const revenueForDesired = unitsForDesired * price;
+
+  const safetyMarginUnits = effUnits - beUnits;
+  const safetyMarginPct = effUnits > 0 ? (safetyMarginUnits / effUnits) * 100 : 0;
+
+  let paybackMonths = null;
+  if (investment > 0 && netProfit > 0) {
+    paybackMonths = investment / netProfit;
+  }
+
+  return {
+    error: null,
+    fixed, varCost, price, expectedUnits, effUnits, investment, desiredProfit, otherExp,
+    contribMargin, contribMarginPct, totalFixed, beUnits, beRevenue, expRevenue,
+    expVarCost, totalCostBeforeTax, netProfit, profitMarginPct, unitsForDesired,
+    revenueForDesired, safetyMarginUnits, safetyMarginPct, paybackMonths
+  };
+}
+
+function updateBreakEvenUI() {
+  const params = {
+    fixed: document.getElementById("b_fixed").value,
+    varCost: document.getElementById("b_var").value,
+    price: document.getElementById("b_price").value,
+    expectedUnits: document.getElementById("b_units").value,
+    investment: document.getElementById("b_invest").value,
+    desiredProfit: document.getElementById("b_desired_profit").value,
+    growth: document.getElementById("b_growth").value,
+    wastage: document.getElementById("b_wastage").value,
+    otherExp: document.getElementById("b_otherexp").value,
+    taxRate: document.getElementById("b_tax").value,
+  };
+
+  const res = runBreakEvenCalculation(params);
+  const errDiv = document.getElementById("beErrorMsg");
+
+  if (res.error) {
+    errDiv.textContent = res.error;
+    errDiv.style.display = "block";
+    return;
+  }
+  errDiv.style.display = "none";
+
+  // Display outputs safely
+  document.getElementById("beUnits").textContent = isFinite(res.beUnits) ? res.beUnits.toLocaleString("en-IN") : "—";
+  document.getElementById("beRevenue").textContent = isFinite(res.beRevenue) ? "₹" + Math.round(res.beRevenue).toLocaleString("en-IN") : "—";
+  document.getElementById("beProfit").textContent = "₹" + Math.round(res.netProfit).toLocaleString("en-IN");
+  document.getElementById("beMargin").textContent = "₹" + res.contribMargin.toFixed(2);
+  document.getElementById("beMarginPct").textContent = res.contribMarginPct.toFixed(1) + "%";
+  document.getElementById("beProfitMarginPct").textContent = res.profitMarginPct.toFixed(1) + "%";
+  document.getElementById("beExpRevenue").textContent = "₹" + Math.round(res.expRevenue).toLocaleString("en-IN");
+  document.getElementById("beExpTotalCost").textContent = "₹" + Math.round(res.totalCostBeforeTax).toLocaleString("en-IN");
+  document.getElementById("beEffUnits").textContent = Math.round(res.effUnits).toLocaleString("en-IN");
+  document.getElementById("beDesiredUnits").textContent = isFinite(res.unitsForDesired) ? res.unitsForDesired.toLocaleString("en-IN") : "—";
+  document.getElementById("beDesiredRevenue").textContent = isFinite(res.revenueForDesired) ? "₹" + Math.round(res.revenueForDesired).toLocaleString("en-IN") : "—";
+  document.getElementById("beSafetyMargin").textContent = Math.round(res.safetyMarginUnits).toLocaleString("en-IN") + " units";
+  document.getElementById("beSafetyPct").textContent = res.safetyMarginPct.toFixed(1) + "%";
+  document.getElementById("bePayback").textContent = res.paybackMonths ? res.paybackMonths.toFixed(1) + " months" : "N/A";
+
+  // Business Health Indicator
+  const badge = document.getElementById("beHealthBadge");
+  const explain = document.getElementById("beHealthExplain");
+
+  if (res.effUnits > res.beUnits * 1.1) {
+    badge.className = "health-badge profitable";
+    badge.textContent = "🟢 PROFITABLE";
+    explain.textContent = "Your expected sales are comfortably above the break-even point, providing a healthy safety margin.";
+  } else if (res.effUnits >= res.beUnits) {
+    badge.className = "health-badge near";
+    badge.textContent = "🟡 NEAR BREAK-EVEN";
+    explain.textContent = "Your sales cover your costs, but your safety margin is slim. Consider raising prices slightly or lowering costs.";
+  } else {
+    badge.className = "health-badge loss";
+    badge.textContent = "🔴 OPERATING AT A LOSS";
+    explain.textContent = "Expected sales are below the break-even point. Increase sales volume, raise selling price, or reduce fixed/variable costs.";
+  }
+}
+
+document.getElementById("calcBreakEvenBtn").addEventListener("click", updateBreakEvenUI);
+
+// ---------- 7. GOVERNMENT SCHEMES DATA & MATCHING ----------
+const SCHEMES_DATA = [
+  {
+    id: "pmegp",
+    title: "Prime Minister's Employment Generation Programme (PMEGP)",
+    subsidy: "15% - 35% Capital Subsidy",
+    maxLoan: "Up to ₹50 Lakhs (Manufacturing) / ₹20 Lakhs (Service)",
+    eligibleBtypes: ["kirana", "tailoring", "dairy", "handicrafts", "food", "mobile", "beauty", "other"],
+    minCapital: 0,
+    desc: "Credit-linked subsidy scheme for setting up new micro-enterprises in rural and urban areas."
+  },
+  {
+    id: "mudra",
+    title: "MUDRA Loan (Shishu / Kishor / Tarun)",
+    subsidy: "Collateral-free Institutional Loan",
+    maxLoan: "Up to ₹10 Lakhs (Shishu: ₹50K, Kishor: ₹5L, Tarun: ₹10L)",
+    eligibleBtypes: ["kirana", "tailoring", "dairy", "handicrafts", "food", "agri", "mobile", "beauty", "other"],
+    minCapital: 0,
+    desc: "Provides non-farm micro-enterprise loans without collateral requirements."
+  },
+  {
+    id: "standup",
+    title: "Stand-Up India Scheme",
+    subsidy: "Bank Credit for Women and SC/ST Entrepreneurs",
+    maxLoan: "₹10 Lakhs to ₹1 Crore",
+    eligibleBtypes: ["kirana", "tailoring", "dairy", "handicrafts", "food", "agri", "mobile", "beauty", "other"],
+    minCapital: 10000,
+    desc: "Facilitates bank loans for greenfield enterprises set up by SC, ST, or women entrepreneurs."
+  },
+  {
+    id: "pmfme",
+    title: "PM Formalisation of Micro Food Processing Enterprises (PMFME)",
+    subsidy: "35% Credit-linked Capital Subsidy",
+    maxLoan: "Up to ₹10 Lakhs subsidy cap",
+    eligibleBtypes: ["food", "dairy"],
+    minCapital: 0,
+    desc: "Aims to enhance the competitiveness of existing micro-enterprises in the unorganized food processing sector."
+  }
+];
+
+function renderSchemes() {
+  const container = document.getElementById("schemeResults");
+  if (!container) return;
+  const p = APP.profile;
+
+  const matched = SCHEMES_DATA.filter(s => {
+    if (p.btype && !s.eligibleBtypes.includes(p.btype)) return false;
+    if (p.capital && p.capital < s.minCapital) return false;
+    return true;
+  });
+
+  if (matched.length === 0) {
+    container.innerHTML = `<p style="color:var(--muted)">No specific schemes matched your current profile, but general MUDRA loans remain available.</p>`;
+    return;
+  }
+
+  container.innerHTML = matched.map(s => `
+    <div class="card" style="border-left:5px solid var(--green);margin-bottom:12px;">
+      <h3 style="margin:0 0 6px;color:var(--green-d);">${s.title}</h3>
+      <p style="margin:4px 0;font-size:.9rem;"><strong>Support:</strong> ${s.subsidy}</p>
+      <p style="margin:4px 0;font-size:.9rem;"><strong>Loan Limit:</strong> ${s.maxLoan}</p>
+      <p style="margin:6px 0 0;font-size:.85rem;color:var(--muted);">${s.desc}</p>
+    </div>
+  `).join('');
+}
+document.getElementById("rerunMatchBtn").addEventListener("click", renderSchemes);
+
+// ---------- 8. VOICE RECOGNITION & SPEECH SYNTHESIS ENGINE ----------
+let synth = window.speechSynthesis;
+let currentUtterance = null;
+
+function speak(text) {
+  if (!text) return;
+  if (synth.speaking) synth.cancel();
+
+  const langCode = SPEECH_LANG[APP.lang] || "en-IN";
+  currentUtterance = new SpeechSynthesisUtterance(text);
+  currentUtterance.lang = langCode;
+
+  const voiceState = document.getElementById("voiceState");
+  const voicePanel = document.getElementById("voicePanel");
+  
+  currentUtterance.onstart = () => {
+    if(voiceState) voiceState.textContent = "🔊 " + t("speaking");
+    document.getElementById("voiceResponse").textContent = text;
+  };
+  currentUtterance.onend = () => {
+    if(voiceState) voiceState.textContent = "🎙️ Ready";
+  };
+
+  synth.speak(currentUtterance);
+}
+
+function getRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return null;
+  const r = new SpeechRecognition();
+  r.continuous = false;
+  r.interimResults = false;
+  r.lang = SPEECH_LANG[APP.lang] || "en-IN";
+  return r;
+}
+
+function openVoicePanel() {
+  document.getElementById("voicePanel").classList.remove("hidden");
+  document.getElementById("voiceTranscript").textContent = "";
+  document.getElementById("voiceResponse").textContent = "";
+}
+
+function closeVoicePanel() {
+  document.getElementById("voicePanel").classList.add("hidden");
+  if (synth.speaking) synth.cancel();
+}
+
+document.getElementById("vaClose").addEventListener("click", closeVoicePanel);
+document.getElementById("vaPause").addEventListener("click", () => { if (synth.speaking) synth.cancel(); });
+document.getElementById("vaRepeat").addEventListener("click", () => {
+  const resp = document.getElementById("voiceResponse").textContent;
+  if (resp) speak(resp);
+});
+
+const micFab = document.getElementById("micFab");
+micFab.addEventListener("click", () => {
+  openVoicePanel();
+  startListening();
+});
+
+document.getElementById("vaSpeakAgain").addEventListener("click", startListening);
+
+function startListening() {
+  const r = getRecognition();
+  if (!r) {
+    alert(t("micNotSupported"));
+    return;
+  }
+
+  const state = document.getElementById("voiceState");
+  const transcriptDiv = document.getElementById("voiceTranscript");
+
+  r.onstart = () => {
+    micFab.classList.add("listening");
+    if(state) state.textContent = "🎙️ " + t("listening");
+  };
+
+  r.onresult = (e) => {
+    micFab.classList.remove("listening");
+    if(state) state.textContent = "🤖 " + t("understanding");
+    const text = e.results[0][0].transcript;
+    transcriptDiv.textContent = `"${text}"`;
+    processVoiceCommand(text);
+  };
+
+  r.onerror = () => {
+    micFab.classList.remove("listening");
+    if(state) state.textContent = "🎙️ Ready";
+  };
+
+  r.start();
+}
+
+function extractAmount(str) {
+  const match = str.match(/\d[\d,.]*/);
+  if (match) return Number(match[0].replace(/,/g, ''));
+  return null;
+}
+
+function processVoiceCommand(cmd) {
+  const lower = cmd.toLowerCase();
+
+  // Navigation Intents
+  if (/home|హోమ్|होम|go home/.test(lower)) {
+    switchTab("home");
+    speak("Opening Home screen.");
+    return;
+  }
+  if (/note| digital memory|నోట్స్|नोटస్|डिजिटल मेमोरी/.test(lower)) {
+    if (/create|add|new|చేయి|बनाएं/.test(lower)) {
+      switchTab("notes");
+      openNoteModal();
+      speak("Opening note creation modal.");
+      return;
+    }
+    switchTab("notes");
+    speak("Opening your saved notes.");
+    return;
+  }
+  if (/profile|ప్రొఫైల్|प्रोफ़ाइल/.test(lower)) {
+    switchTab("profile");
+    speak("Opening profile settings.");
+    return;
+  }
+  if (/advisor|ask|సలహా|सलाहकार/.test(lower)) {
+    switchTab("advisor");
+    speak("Opening AI Business Advisor.");
+    return;
+  }
+  if (/scheme|government|పథకాలు|योजनाएं/.test(lower)) {
+    switchTab("schemes");
+    speak("Showing government schemes matched to your profile.");
+    return;
+  }
+  if (/compare|పోలిక|तुलना/.test(lower)) {
+    switchTab("compare");
+    speak("Opening business performance comparison.");
+    return;
+  }
+  if (/dashboard|డాష్‌బోర్డ్|डैशबोर्ड/.test(lower)) {
+    switchTab("dashboard");
+    const rev = APP.profile.revenue ? `Your saved monthly revenue is ₹${APP.profile.revenue.toLocaleString('en-IN')}.` : "No revenue saved yet.";
+    const cap = APP.profile.capital ? `Your saved capital is ₹${APP.profile.capital.toLocaleString('en-IN')}.` : "No capital saved yet.";
+    speak(`Opening Dashboard. ${rev} ${cap}`);
+    return;
+  }
+
+  // Financial Commands Integration
+  if (/loan|emi|interest|రుణం|వాయిదా|ऋण|किस्त/.test(lower)) {
+    switchTab("financial");
+    const val = extractAmount(lower);
+    if (val && /loan|amount|రుణం|राशि/.test(lower)) {
+      document.getElementById("f_amount").value = val;
+    }
+    document.getElementById("calcEmiBtn").click();
+    const emiRes = document.getElementById("emiVal").textContent;
+    speak(`Calculated EMI is ${emiRes} per month.`);
+    return;
+  }
+
+  if (/break even|break-even|profit|selling price|fixed cost|బ్రేక్ ఈవెన్|లాభం|लाभ/.test(lower)) {
+    switchTab("financial");
+    if (/fixed cost|స్థిర ఖర్చు|स्थिर लागत/.test(lower)) {
+      const v = extractAmount(lower);
+      if (v) document.getElementById("b_fixed").value = v;
+    }
+    if (/selling price|అమ్మకపు ధర|विक्रय मूल्य/.test(lower)) {
+      const v = extractAmount(lower);
+      if (v) document.getElementById("b_price").value = v;
+    }
+    updateBreakEvenUI();
+    const units = document.getElementById("beUnits").textContent;
+    const profit = document.getElementById("beProfit").textContent;
+    speak(`Break-even is ${units} units per month. Estimated monthly profit is ${profit}.`);
+    return;
+  }
+
+  // Fallback to Advisor logic
+  const reply = getAdvisorReply(cmd);
+  speak(reply);
+}
+
+function handleFinancialVoiceIntent(msg) {
+  const amt = extractAmount(msg) || 50000;
+  const emi = calcEMI(amt, 12, 24);
+  return `For a loan of ₹${amt.toLocaleString("en-IN")} at 12% interest for 2 years, your monthly EMI will be approximately ₹${Math.round(emi).toLocaleString("en-IN")}.`;
+}
+
+// ---------- EASY VOICE WIZARD ----------
+let wizardIndex = 0;
+const wizardQuestions = [
+  { field: "p_owner", qKey: "wizardQOwner" },
+  { field: "p_btype", qKey: "wizardQType", isSelect: true },
+  { field: "p_village", qKey: "wizardQVillage" },
+  { field: "p_district", qKey: "wizardQDistrict" },
+  { field: "p_years", qKey: "wizardQYears", isNum: true },
+  { field: "p_revenue", qKey: "wizardQRevenue", isNum: true },
+  { field: "p_capital", qKey: "wizardQCapital", isNum: true },
+  { field: "p_challenge", qKey: "wizardQChallenge", isSelect: true }
+];
+
+document.getElementById("startEasyVoiceProfile").addEventListener("click", startEasyVoiceWizard);
+document.getElementById("wizardExit").addEventListener("click", () => document.getElementById("easyWizard").classList.add("hidden"));
+
+function startEasyVoiceWizard() {
+  wizardIndex = 0;
+  document.getElementById("easyWizard").classList.remove("hidden");
+  askWizardQuestion();
+}
+
+function askWizardQuestion() {
+  if (wizardIndex >= wizardQuestions.length) {
+    document.getElementById("easyWizard").classList.add("hidden");
+    document.getElementById("saveProfileBtn").click();
+    return;
+  }
+  const qObj = wizardQuestions[wizardIndex];
+  const qText = t(qObj.qKey);
+  document.getElementById("wizardQ").textContent = qText;
+  document.getElementById("wizardAnswer").textContent = "";
+  document.getElementById("wizardConfirmRow").style.display = "none";
+  speak(qText);
+}
+
+document.getElementById("wizardMic").addEventListener("click", () => {
+  const r = getRecognition();
+  if (!r) {
+    alert(t("micNotSupported"));
+    return;
+  }
+  r.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    document.getElementById("wizardAnswer").textContent = text;
+    document.getElementById("wizardConfirmRow").style.display = "flex";
+    speak(`${t("isThisCorrect")} "${text}"`);
+  };
+  r.start();
+});
+
+document.getElementById("wizardYes").addEventListener("click", () => {
+  const qObj = wizardQuestions[wizardIndex];
+  const ans = document.getElementById("wizardAnswer").textContent;
+  const inputEl = document.getElementById(qObj.field);
+
+  if (qObj.isNum) {
+    const num = extractAmount(ans) || 0;
+    inputEl.value = num;
+  } else if (qObj.isSelect) {
+    inputEl.selectedIndex = 0;
+  } else {
+    inputEl.value = ans;
+  }
+
+  wizardIndex++;
+  askWizardQuestion();
+});
+
+document.getElementById("wizardChange").addEventListener("click", askWizardQuestion);
+
+// ---------- BUSINESS COMPARISON ----------
+let compareBusinesses = [
+  { kind: "previous", name: "", investment: 0, revenue: 0, expenses: 0, customers: 0, notes: "" },
+  { kind: "current", name: "", investment: 0, revenue: 0, expenses: 0, customers: 0, notes: "" }
+];
+
+function money(v){ return "₹" + Math.round(Number(v)||0).toLocaleString("en-IN"); }
+function num(v){ return Math.max(0, Number(v)||0); }
+function esc(v){ return String(v??"").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c])); }
+function kindLabel(kind){ return kind === "previous" ? "Previous Business" : kind === "current" ? "Current Business" : "Proposed Business"; }
+
+function renderCompareCards(){
+  const wrap=document.getElementById("compareCardsWrap");
+  if(!wrap) return;
+  wrap.innerHTML=compareBusinesses.map((b,i)=>`<div class="compare-card kind-${b.kind}">
+    <h3>${kindLabel(b.kind)} <span class="kindTag">${kindLabel(b.kind)}</span></h3>
+    ${i>1 ? `<button class="removeBizBtn" type="button" data-remove-biz="${i}" aria-label="Remove business">✕</button>` : ""}
+    <label>Business name</label><input id="cmp_name_${i}" type="text" value="${esc(b.name)}" placeholder="e.g. Kirana Store">
+    <label>Investment (₹)</label><input id="cmp_inv_${i}" type="number" min="0" step="1" value="${b.investment||""}" placeholder="50000">
+    <label>Monthly Revenue (₹)</label><input id="cmp_rev_${i}" type="number" min="0" step="1" value="${b.revenue||""}" placeholder="30000">
+    <label>Monthly Expenses (₹)</label><input id="cmp_exp_${i}" type="number" min="0" step="1" value="${b.expenses||""}" placeholder="20000">
+    <label>Number of Customers</label><input id="cmp_cust_${i}" type="number" min="0" step="1" value="${b.customers||""}" placeholder="100">
+    <label>Main Challenges / Advantages</label><textarea id="cmp_notes_${i}" rows="2" placeholder="Optional">${esc(b.notes)}</textarea>
+  </div>`).join("");
+  wrap.querySelectorAll("input,textarea").forEach(el=>el.addEventListener("input",syncCompareData));
+  wrap.querySelectorAll("[data-remove-biz]").forEach(btn=>btn.addEventListener("click",()=>{
+    compareBusinesses.splice(Number(btn.dataset.removeBiz),1); renderCompareCards();
+  }));
+}
+function syncCompareData(){
+  compareBusinesses.forEach((b,i)=>{
+    b.name=document.getElementById(`cmp_name_${i}`)?.value.trim()||"";
+    b.investment=num(document.getElementById(`cmp_inv_${i}`)?.value);
+    b.revenue=num(document.getElementById(`cmp_rev_${i}`)?.value);
+    b.expenses=num(document.getElementById(`cmp_exp_${i}`)?.value);
+    b.customers=num(document.getElementById(`cmp_cust_${i}`)?.value);
+    b.notes=document.getElementById(`cmp_notes_${i}`)?.value.trim()||"";
+  });
+}
+function computedBusinesses(){
+  return compareBusinesses.map(b=>({...b, profit:b.revenue-b.expenses, ratio:b.investment>0?(b.revenue-b.expenses)/b.investment:0, margin:b.revenue>0?((b.revenue-b.expenses)/b.revenue)*100:0}));
+}
+function drawCompareChart(rows){
+  const c=document.getElementById("compareChart"); if(!c) return;
+  const ctx=c.getContext("2d"), dpr=window.devicePixelRatio||1, w=640,h=280;
+  c.width=w*dpr; c.height=h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h);
+  const max=Math.max(1,...rows.map(r=>Math.max(Math.abs(r.profit),r.revenue,r.expenses)));
+  const base=230, chartH=180, barW=Math.min(90, (w-80)/(rows.length*1.6));
+  ctx.strokeStyle="#ccc"; ctx.beginPath(); ctx.moveTo(45,base); ctx.lineTo(615,base); ctx.stroke();
+  rows.forEach((r,i)=>{
+    const x=65+i*((w-100)/Math.max(1,rows.length));
+    const bh=Math.max(2,Math.abs(r.profit)/max*chartH);
+    ctx.fillStyle=r.profit>=0?"#1b7a3d":"#c0392b";
+    if(r.profit>=0) ctx.fillRect(x,base-bh,barW,bh); else ctx.fillRect(x,base,barW,bh);
+    ctx.fillStyle="#1f2a24"; ctx.font="bold 11px Arial"; ctx.textAlign="center";
+    ctx.fillText((r.name||kindLabel(r.kind)).slice(0,14),x+barW/2,255);
+    ctx.fillText(money(r.profit),x+barW/2,r.profit>=0?base-bh-7:base+bh+14);
+  });
+  ctx.textAlign="left"; ctx.font="12px Arial"; ctx.fillStyle="#5c6b62"; ctx.fillText("Monthly profit",45,18);
+}
+function runComparison(){
+  syncCompareData();
+  const rows=computedBusinesses().filter(b=>b.name||b.revenue||b.expenses||b.investment);
+  if(rows.length<2){ alert("Please enter details for at least two businesses before comparing."); return; }
+  document.getElementById("compareResultsCard").style.display="block";
+  document.getElementById("multiCompareCard").style.display=rows.length>2?"block":"none";
+  document.getElementById("insightCard").style.display="block";
+  const prev=rows[0], curr=rows[1];
+  const change=curr.profit-prev.profit, pct=prev.profit!==0?(change/Math.abs(prev.profit))*100:0;
+  document.getElementById("profitFlow").innerHTML=`<div class="flow-box prev"><div class="flabel">${esc(prev.name||kindLabel(prev.kind))}</div><div class="fval">${money(prev.profit)}</div></div><div class="flow-arrow">↓</div><div class="flow-box curr"><div class="flabel">${esc(curr.name||kindLabel(curr.kind))}</div><div class="fval">${money(curr.profit)}</div><div class="improve-badge ${change<0?"negative":""}">${change>=0?"▲ ":"▼ "}${money(Math.abs(change))}${prev.profit!==0?` (${Math.abs(pct).toFixed(1)}%)`:""}</div></div>`;
+  const what=[
+    ["Revenue",money(prev.revenue),money(curr.revenue),curr.revenue-prev.revenue],
+    ["Expenses",money(prev.expenses),money(curr.expenses),curr.expenses-prev.expenses],
+    ["Monthly Profit",money(prev.profit),money(curr.profit),curr.profit-prev.profit],
+    ["Customers",Math.round(prev.customers).toLocaleString("en-IN"),Math.round(curr.customers).toLocaleString("en-IN"),curr.customers-prev.customers]
+  ];
+  document.getElementById("whatChanged").innerHTML=what.map(x=>`<div class="change-row"><span>${x[0]}</span><span>${x[1]} → ${x[2]} <b class="${x[3]>=0?"up":"down"}">${x[3]>=0?"▲":"▼"} ${Math.abs(x[3]).toLocaleString("en-IN")}</b></span></div>`).join("");
+  drawCompareChart(rows);
+  const best=[...rows].sort((a,b)=>b.profit-a.profit)[0];
+  document.getElementById("insightText").textContent=`${best.name||kindLabel(best.kind)} currently has the highest estimated monthly profit at ${money(best.profit)}. Compare revenue, expenses and customer counts before making an investment decision. These are prototype estimates, not verified financial data.`;
+  document.getElementById("multiCompareTableWrap").innerHTML=`<table class="cmp-table"><thead><tr><th>Business</th><th>Investment</th><th>Revenue</th><th>Expenses</th><th>Profit</th><th>Profit/Investment</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.name||kindLabel(r.kind))}</td><td>${money(r.investment)}</td><td>${money(r.revenue)}</td><td>${money(r.expenses)}</td><td>${money(r.profit)}</td><td>${(r.ratio*100).toFixed(1)}%</td></tr>`).join("")}</tbody></table>`;
+}
+function sortComparison(type){
+  syncCompareData();
+  const fixed=compareBusinesses.slice(0,2), extra=compareBusinesses.slice(2);
+  const all=[...fixed,...extra];
+  if(type==="profit") all.sort((a,b)=>(b.revenue-b.expenses)-(a.revenue-a.expenses));
+  if(type==="investment") all.sort((a,b)=>num(a.investment)-num(b.investment));
+  if(type==="ratio") all.sort((a,b)=>((b.investment?b.revenue-b.expenses:0)/Math.max(1,b.investment))-((a.investment?a.revenue-a.expenses:0)/Math.max(1,a.investment)));
+  compareBusinesses=all; renderCompareCards(); runComparison();
+}
+
+document.getElementById("addBusinessBtn")?.addEventListener("click",()=>{
+  if(compareBusinesses.length>=6){ alert("You can compare up to 6 businesses at a time."); return; }
+  compareBusinesses.push({kind:"proposed",name:"",investment:0,revenue:0,expenses:0,customers:0,notes:""}); renderCompareCards();
+});
+document.getElementById("runCompareBtn")?.addEventListener("click",runComparison);
+document.querySelectorAll(".sortBtn").forEach(b=>b.addEventListener("click",()=>sortComparison(b.dataset.sort)));
+document.getElementById("dashboardCompareViewBtn")?.addEventListener("click",()=>switchTab("compare"));
+renderCompareCards();
+
+// Initial Load
+renderSchemes();
+renderNotes();
+</script>
+</body>
+</html>
